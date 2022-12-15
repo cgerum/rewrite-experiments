@@ -56,6 +56,6 @@ fn test_parse_ewise(){
 
     let mut graph : EGraph::<TensorLang, ()> = Default::default();
 
-    graph.add_expr(&conv_expr);
+    graph.add_expr(&expr);
     graph.rebuild();
 }

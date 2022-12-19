@@ -6,6 +6,8 @@ use std::collections::HashSet;
 
 use egg::{Analysis, DidMerge, EGraph, Id, RecExpr};
 
+use ndarray::{ArrayD, Data};
+
 use crate::language::{TensorLang};
 
 
@@ -16,6 +18,7 @@ pub enum DataKind {
     Scalar,
     Tensor,
     Shape, 
+    List, 
 }
 
 impl Default for DataKind {
@@ -39,6 +42,8 @@ pub struct TensorData {
     pub constant: bool,
     /// Shape if it is a shape or tensor type
     pub shape: Vec<i32>,
+    /// Data 
+    pub data: Option<ArrayD<i32>>, //FIXME: allow symbolic values
 }
 
 impl Default for TensorData {
@@ -49,6 +54,7 @@ impl Default for TensorData {
             name: String::from(""),
             constant: false,
             shape: Vec::default(),
+            data: None,
         }
     }
 }
@@ -63,7 +69,6 @@ impl Default for TensorData {
 pub struct TensorAnalysis{
 }
 
-
 impl Analysis<TensorLang> for TensorAnalysis {
     type Data = TensorData;
 
@@ -72,6 +77,24 @@ impl Analysis<TensorLang> for TensorAnalysis {
         let x = |i: &Id| &egraph[*i].data;
 
         match enode {
+            TensorLang::List(values) => {
+                let mut lst : Vec<i32> = Vec::default();
+
+                for elem in values.iter() {
+                    let data = x(elem);
+                    assert!(data.kind == DataKind::Scalar);
+                    assert!(data.constant == true);
+                    lst.push(data.val);
+                }
+
+
+                Self::Data{
+                    kind: DataKind::Shape,
+                    data: None, // FIXME: extract dataSome(ArrayD::from(lst)),
+                    ..Default::default()
+                }
+            }
+
             TensorLang::Shape(shape) => {
 
                 let mut s : Vec<i32> = Vec::default();
@@ -100,9 +123,9 @@ impl Analysis<TensorLang> for TensorAnalysis {
 
                 Self::Data{
                     kind: DataKind::Tensor,
-                    name: name_data.name,
+                    name: name_data.name.clone(),
                     constant: false,
-                    shape: shape_data.shape,
+                    shape: shape_data.shape.clone(),
                     ..Default::default()
                 }
             }
@@ -116,49 +139,48 @@ impl Analysis<TensorLang> for TensorAnalysis {
 
                 Self::Data{
                     kind: DataKind::Tensor,
-                    name: name_data.name,
+                    name: name_data.name.clone(),
                     constant: true,
-                    shape: shape_data.shape,
+                    shape: shape_data.shape.clone(),
                     ..Default::default()
                 }
             }
 
             TensorLang::Matmul([a_id, b_id]) => {
                 // Check types
-                let a_data = x(a);
-                let b_data = x(b);
-                assert!(a_data.kind == DataKind::Tensor)
-                assert!(b_data.kind == DataKind::Tensor)
+                let a_data = x(a_id);
+                let b_data = x(b_id);
+                assert!(a_data.kind == DataKind::Tensor);
+                assert!(b_data.kind == DataKind::Tensor);
                 
                 // Get arguments
                 let constant = a_data.constant && b_data.constant;
 
                 // Create tensorhandle and get metadata
                 Self::Data {
-                    dtype: DataKind::Tensor,
-                    name: String::new(),
-                    contant: constant,
+                    kind: DataKind::Tensor,
+                    constant: constant,
                     ..Default::default()
                 }
             }
 
             TensorLang::Conv2d([stride_h, stride_w, pad, act, inpt, wght]) => {
                 // Check types
-                assert!(x(stride_h).dtype == DataKind::Scalar);
-                assert!(x(stride_w).dtype == DataKind::Scalar);
-                assert!(x(pad).dtype == DataKind::Scalar);
-                assert!(x(act).dtype == DataKind::Scalar);
-                assert!(x(inpt).dtype == DataKind::Tnsr);
-                assert!(x(wght).dtype == DataKind::Tnsr);
+                assert!(x(stride_h).kind == DataKind::Scalar);
+                assert!(x(stride_w).kind == DataKind::Scalar);
+                assert!(x(pad).kind == DataKind::Scalar);
+                assert!(x(act).kind == DataKind::Scalar);
+                assert!(x(inpt).kind == DataKind::Tensor);
+                assert!(x(wght).kind == DataKind::Tensor);
 
                 // Get arguments
                 let strideH = x(stride_h).val;
                 let strideW = x(stride_w).val;
-                let constant = constant;
+                let constant = x(inpt).constant && x(wght).constant;
 
                 // Create tensorhandle and get metadata
                 Self::Data {
-                    dtype: DataKind::Tensor,
+                    kind: DataKind::Tensor,
                     val: 0,
                     name: String::new(),
                     constant: constant,
@@ -167,98 +189,35 @@ impl Analysis<TensorLang> for TensorAnalysis {
             }
 
  
-            TensorLang::Sigmoid(a) => {
-                assert!(x(a).dtype == DataKind::Tnsr);
-                let all_weights = x(a).all_weights;
+            TensorLang::Elementwise([func, a]) => {
+                assert!(x(a).kind == DataKind::Tensor);
+                let constant = x(a).constant;
 
                 
                 Self::Data {
-                    dtype: DataKind::Tnsr,
+                    kind: DataKind::Tensor,
                     val: 0,
                     name: String::new(),
-                    all_weights: all_weights,
+                    constant: constant,
                     ..Default::default()
                 }
             }
-
-            TensorLang::Input([name, shape]) => {
+            TensorLang::Transpose([inpt,  shuffle]) => {
                 // Check types
-                assert!(x(name).dtype == DataKind::Name);
+                assert!(x(inpt).kind == DataKind::Tensor);
+                assert!(x(shuffle).kind == DataKind::List);
 
-                // Get arguments
-                let mut dims = x(shape).shape.to_vec();
-                let ndim = dims.len();
-                dims.shrink_to_fit();
-                assert!(dims.len() == dims.capacity());
-                let ptr = dims.as_mut_ptr();
-                std::mem::forget(dims);
-
-                // Create tensorhandle and get metadata
-                Self::Data {
-                    dtype: DataKind::Tnsr,
-                    val: 0,
-                    name: String::new(),
-                    all_weights: false,
-                    ..Default::default()
-                }
-            }
-
-            TensorLang::Weight([name, shape]) => {
-                // Check types
-                assert!(x(name).dtype == DataKind::Name);
-
-                // Get arguments
-                let mut dims = x(shape).shape.to_vec();
-                let ndim = dims.len();
-                dims.shrink_to_fit();
-                assert!(dims.len() == dims.capacity());
-
-                let num_entries = dims.iter().product();
-                let mut weight_data: Vec<f32> = (0..num_entries).map(|_| rand::random()).collect();
-                weight_data.shrink_to_fit();
-                assert!(weight_data.len() == weight_data.capacity());
-
-                let ptr = dims.as_mut_ptr();
-                std::mem::forget(dims);
-                let data_ptr = weight_data.as_mut_ptr();
-                std::mem::forget(weight_data);
-
-                // Create tensorhandle and get metadata
-                Self::Data {
-                    dtype: DataKind::Tnsr,
-                    val: 0,
-                    name: String::new(),
-                    all_weights: true,
-                    ..Default::default()
-                }
-            }
-
-            TensorLang::Transpose([inpt, perm_name, shuffle]) => {
-                // Check types
-                assert!(x(perm_name).dtype == DataKind::Name);
-                assert!(x(inpt).dtype == DataKind::Tnsr);
-                assert!(x(shuffle).dtype == DataKind::Scalar);
-
-                // Get arguments
-                let perms: Vec<i32> = x(perm_name)
-                    .name
-                    .split("_")
-                    .map(|x| x.parse::<i32>().unwrap())
-                    .collect();
-
-                let shuffle_val = x(shuffle).val;
-                let shuffle_bool = shuffle_val == 1;
-                let all_weights = x(inpt).all_weights;
+                let constant = x(inpt).constant;
 
                 
                 Self::Data {
-                    dtype: DataKind::Tnsr,
+                    kind: DataKind::Tensor,
                     val: 0,
                     name: String::new(),
-                    all_weights: all_weights,
+                    constant: constant,
                     ..Default::default()
                 }
-            }*/
+            }
 
             TensorLang::Num(_n) => Self::Data {
                 kind: DataKind::Scalar,
@@ -275,7 +234,38 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 constant: false,
                 ..Default::default()
             },
+
+            TensorLang::Add([a, b]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Scalar;
+                data
+            }
+
+            TensorLang::Sub([a, b]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Scalar;
+                data
+            }
+
+            TensorLang::Mul([a, b]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Scalar;
+                data
+            }
+
+            TensorLang::CeilDiv([a, b]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Scalar;
+                data
+            }
+
             
+            TensorLang::CeilRem([a, b]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Scalar;
+                data
+            }
+
             other => {
                 println!("{:?}", other);
                 todo!()

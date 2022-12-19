@@ -9,10 +9,12 @@ define_language! {
     pub enum TensorLang {
         "list"      = List(Box<[Id]>),    // Represents a variable length list
         "shape"     = Shape(Box<[Id]>),   // Takes a variable length list for shapes
-        "tensor"    = Tensor([Id; 2]),    // takes a Symbol and a Shape, format: name, shape    
-        "const"     = Const([Id; 2]),     // takes a Symbol and a Shape, format : name, shape
-        "transpose" = Transpose([Id; 2]), // input, list of axis in order after tranposition
-        
+        "tensor"    = Tensor([Id; 2]),     // takes a Symbol and a Shape, format: name, shape    
+        "const"     = Const([Id; 2]),      // takes a Symbol and a Shape, format : name, shape
+        "transpose" = Transpose([Id; 2]),  // input, list of axis in order after tranposition
+        "split"     = Split([Id; 3]),      // Split a tensor into a list of tensors, input, chunksize: scalar (or list of scalars), dim, scalar
+        "stack"     = Stack([Id; 2]),      // Stack a list of tensors a long a dimensions, 
+
         // TODO: generalized layout transform
         // "layout"    = Layout([Id; 3]),    // input, list of symbols of lenght, list of affine expressions
         
@@ -52,7 +54,7 @@ fn test_parse_expr() {
 
 #[test]
 fn test_parse_ewise(){
-    let expr : RecExpr<TensorLang> = "(elementwise sigmoid a)";
+    let expr : RecExpr<TensorLang> = "(elementwise sigmoid a)".parse().unwrap();
 
     let mut graph : EGraph::<TensorLang, ()> = Default::default();
 

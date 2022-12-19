@@ -70,3 +70,11 @@ test_fn! {
     runner = Runner::<TensorLang, TensorAnalysis>::default(),
     "(// 5 5)" => "1"
 }
+
+
+test_fn! {
+    complex_arith, 
+    scalar_rules(), 
+    runner = Runner::<TensorLang, TensorAnalysis>::default(),
+    "(+ (// 5 (+ 1 (* 0 5))) (* (+ c a) 0))" => "5"
+}

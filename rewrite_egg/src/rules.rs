@@ -1,19 +1,84 @@
 use egg::*;
+use ndarray::Data;
 
 use crate::analysis::*;
 use crate::language::*;
+use ilog::IntLog;
 
+fn highest_power_of_2(n: usize) -> usize {
+    n & !(n-1)
+}
+
+fn var(s: &str) -> Var {
+    s.parse().unwrap()
+}
 
 pub fn is_not_zero(var: &str) -> impl Fn(&mut EGraph<TensorLang, TensorAnalysis>, Id, &Subst) -> bool {
     let var = var.parse().unwrap();
     move |egraph, _, subst| {
-        if let TensorData{kind, val, name, constant, shape, data} = &egraph[subst[var]].data {
+        if let TensorData{kind, val, name: _, constant, shape: _, data: _} = &egraph[subst[var]].data {
             (*val != 0) && *constant && (*kind == DataKind::Scalar)
         } else {
             false
         }
     }
 }
+
+
+pub fn is_tensor(var: &str) -> impl Fn(&mut EGraph<TensorLang, TensorAnalysis>, Id, &Subst) -> bool {
+    let var = var.parse().unwrap();
+    move |egraph, _, subst| {
+        if let TensorData{kind, val, name, constant, shape, data} = &egraph[subst[var]].data {
+            *kind == DataKind::Tensor
+        }else{
+            false
+        }
+    }
+}
+
+struct SplitStackApplier{
+    orig: Var,
+}
+
+
+impl Applier<TensorLang, TensorAnalysis> for SplitStackApplier {
+    fn apply_one(
+        &self,
+        egraph: &mut EGraph<TensorLang, TensorAnalysis>,
+        eclass: Id,
+        subst: &Subst,
+        searcher_ast: Option<&PatternAst<TensorLang>>,
+        rule_name: Symbol,
+    ) -> Vec<Id> {  
+        let a_data = &egraph[eclass].data;
+
+        if a_data.kind == DataKind::Tensor {
+            let mut res = vec![];
+            let shapes = a_data.shape.clone();
+            for i in 1..shapes.len(){
+                let dim_size = shapes[i];
+                let power = highest_power_of_2(usize::try_from(dim_size).unwrap());
+                let exp = power.checked_log2().unwrap();
+                for c in 0..exp {
+                    let power = 2_usize.pow(c.try_into().unwrap());
+                    let pattern: Pattern<TensorLang> = format!("(stack (split ?a {power} {i}) {i})").parse().unwrap();
+                    let mut result = pattern.apply_one(egraph, eclass, subst, searcher_ast, rule_name);
+
+                    res.append(&mut result);
+                }
+            }
+            res
+        }else{
+            vec![]
+        }
+    }
+}
+
+#[rustfmt::skip]
+pub fn split_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
+    rewrite!("exp-split-stack"; "?a" =>  { SplitStackApplier {orig: var("?a") } } ),
+]}
+
 
 #[rustfmt::skip]
 pub fn scalar_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
@@ -77,4 +142,19 @@ test_fn! {
     scalar_rules(), 
     runner = Runner::<TensorLang, TensorAnalysis>::default(),
     "(+ (// 5 (+ 1 (* 0 5))) (* (+ c a) 0))" => "5"
+}
+
+
+test_fn!{
+    split_1,
+    split_rules(),
+    runner = Runner::<TensorLang, TensorAnalysis>::default(),
+    "(tensor test (shape 1 2 3))" => "(stack (split (tensor test (shape 1 2 3)) 1 1) 1)"
+}
+
+test_fn!{
+    split_2,
+    split_rules(),
+    runner = Runner::<TensorLang, TensorAnalysis>::default(),
+    "(tensor test (shape 1 4 3))" => "(stack (split (tensor test (shape 1 4 3)) 2 1) 1)"
 }

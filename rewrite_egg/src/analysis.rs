@@ -266,6 +266,20 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 data
             }
 
+            TensorLang::Stack([a, dim]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::Tensor;
+                data
+            }
+
+            TensorLang::Split([a, chunksize, dim]) => {
+                let mut data : Self::Data = Default::default();
+                data.kind = DataKind::List;
+                data
+            }
+
+            
+
             other => {
                 println!("{:?}", other);
                 todo!()

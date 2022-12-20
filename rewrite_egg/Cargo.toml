@@ -7,5 +7,11 @@ edition = "2021"
 
 [dependencies]
 egg = { version = "0.9.1", features = ["coin_cbc", "reports", "lp"] }
+ilog = "0.1.4"
 ndarray = { version = "0.15.6", features = ["rayon", "serde"] }
 rand = "0.8.5"
+rayon = "1.6.1"
+
+
+[profile.bench]
+debug = true

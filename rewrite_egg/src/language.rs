@@ -15,9 +15,16 @@ define_language! {
         "split"     = Split([Id; 3]),      // Split a tensor into a list of tensors, input, chunksize: scalar (or list of scalars), dim, scalar
         "stack"     = Stack([Id; 2]),      // Stack a list of tensors a long a dimensions, 
 
-        // TODO: generalized layout transform
+        // TODO (cgerum): try to further generalize operator descriptions
+        // TODO (cgerum): generalized layout transform
         // "layout"    = Layout([Id; 3]),    // input, list of symbols of lenght, list of affine expressions
+        // Maybe it makes sense to have "view" as a seperate memory layout transform to explicitly 
+        // describe memory transforms that change the "view" of the memory without actually copying data 
         
+        // TODO (cgerum); generalized compute on tensors
+        // Do we really w
+        // "compute"    = Compute([ID; 3])
+
         //Scalar Expression
         "+"         = Add([Id; 2]),
         "-"         = Sub([Id; 2]),

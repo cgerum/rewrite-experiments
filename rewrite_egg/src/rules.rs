@@ -1,5 +1,6 @@
 use egg::*;
 use ndarray::Data;
+use itertools::Itertools;
 
 use crate::analysis::*;
 use crate::language::*;
@@ -74,10 +75,46 @@ impl Applier<TensorLang, TensorAnalysis> for SplitStackApplier {
     }
 }
 
+struct ExpTransposeApplier  {
+    orig: Var,
+}
+
+impl Applier<TensorLang, TensorAnalysis> for ExpTransposeApplier {
+    fn apply_one(
+        &self,
+        egraph: &mut EGraph<TensorLang, TensorAnalysis>,
+        eclass: Id,
+        subst: &Subst,
+        searcher_ast: Option<&PatternAst<TensorLang>>,
+        rule_name: Symbol,
+    ) -> Vec<Id> {  
+        let a_data = &egraph[eclass].data;
+
+        if a_data.kind == DataKind::Tensor {
+            let dim = a_data.shape.len().clone();
+            if dim > 1 && dim <= 6 {
+                let res = vec![];
+
+                for perm in (0..dim).permutations(dim){
+                    print!("{:?}\n", perm);
+                }
+                res
+            } else {
+                vec![]
+            }
+        }else{
+            vec![]
+        }
+    }
+}
+
 #[rustfmt::skip]
 pub fn split_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
     rewrite!("exp-split-stack"; "?a" =>  { SplitStackApplier {orig: var("?a") } } ),
-]}
+    //rewrite!("stack-matmul"; "(stack (matmul ?a ?b) (matmul ?c ?d) ?dim)" => "(matmul (stack ?a ?c ?dim) (stack ?b ?d ?dim))"),
+    rewrite!("matmul-stack";  "(matmul (stack ?a ?c ?dim) (stack ?b ?d ?dim))" => "(stack (matmul ?a ?b) (matmul ?c ?d) ?dim)"),
+    rewrite!("exp-transpose"; "?a" => { ExpTransposeApplier {orig: var("?a")} }),
+    ]}
 
 
 #[rustfmt::skip]

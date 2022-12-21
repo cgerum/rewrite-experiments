@@ -1,0 +1,4446 @@
+/**
+ ********************************************************************************
+ * Copyright (c) 2015-2022 Robert Bosch GmbH and others.
+ * 
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ * 
+ * SPDX-License-Identifier: EPL-2.0
+ * *******************************************************************************
+ */
+
+@GenModel(
+	modelName="Amalthea", prefix="Amalthea",
+	modelDirectory="/org.eclipse.app4mc.amalthea.model/xcore-gen",
+	editDirectory="/org.eclipse.app4mc.amalthea.model.edit/src-gen",
+	editorDirectory="/org.eclipse.app4mc.amalthea.model.editor/src-gen",
+	rootExtendsClass="org.eclipse.app4mc.amalthea.model.emf.AmaltheaEObjectImpl",
+	providerRootExtendsClass="org.eclipse.app4mc.amalthea.model.provider.AmaltheaItemProviderAdapter",
+	creationIcons="false",
+	forceOverwrite="true",
+	creationSubmenus="true",
+	// *** create XML instance of the Amalthea meta model
+	publicationLocation="org.eclipse.app4mc.amalthea.model/model-gen/xml/amalthea.xml",
+	loadInitialization="false",	// can be removed with Neon.3 ??
+//	dynamicTemplates="true",
+//	templateDirectory="org.eclipse.app4mc.amalthea.model/templates",
+	copyrightText="*******************************************************************************\r\n Copyright (c) 2015-2022 Robert Bosch GmbH and others.\r\n\r\n This program and the accompanying materials are made\r\n available under the terms of the Eclipse Public License 2.0\r\n which is available at https://www.eclipse.org/legal/epl-2.0/\r\n\r\n SPDX-License-Identifier: EPL-2.0\r\n\r\n    Generated using Eclipse EMF\r\n\r\n*******************************************************************************",
+	multipleEditorPages="false",
+	decoration="Live",
+	collapseAllAction="true",
+	expandAllAction="true", 
+	autoExpandProperties="1",
+	eclipsePlatformVersion="2020-06",
+	fileExtensions="amxmi",
+	pluginKey="" // the empty string disables merging of plugin.xml file contents
+)
+
+@Ecore(
+	nsPrefix="am",
+	nsURI="http://app4mc.eclipse.org/amalthea/2.2.0"
+)
+
+package org.eclipse.app4mc.amalthea.model
+
+import org.eclipse.emf.ecore.EDiagnosticChain
+import org.eclipse.emf.ecore.EMap
+import org.eclipse.emf.ecore.InternalEObject
+import org.eclipse.emf.ecore.util.EcoreEList$UnmodifiableEList
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									Central Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class Amalthea extends BaseObject
+{
+	derived readonly String version get {
+		return "2.2.0"
+	}
+
+	contains CommonElements commonElements
+	contains SWModel swModel
+	contains HWModel hwModel
+	contains OSModel osModel
+	contains StimuliModel stimuliModel
+	contains EventModel eventModel
+	contains ConstraintsModel constraintsModel
+	contains PropertyConstraintsModel propertyConstraintsModel
+	contains MappingModel mappingModel
+	contains ComponentsModel componentsModel
+	contains ConfigModel configModel
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									Common Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class CommonElements extends BaseObject
+{
+	contains Tag[] tags
+	contains Namespace[] namespaces
+	contains CoreClassifier[] coreClassifiers
+	contains MemoryClassifier[] memoryClassifiers
+}
+
+/*
+ * Base classes to be used to provide common functionality for all objects.
+ * Needs to be extended by other classes.
+ */
+abstract class BaseObject extends IAnnotatable {}
+
+abstract class ReferableObject extends IReferable {}
+
+abstract class ReferableBaseObject extends IAnnotatable, IReferable {}
+
+/*
+ * IAnnotatable: Possibility to store custom properties on elements
+ */
+interface IAnnotatable
+{
+	contains CustomProperty[] customProperties
+}
+
+/*
+ * ITaggable: Possibility to add tags to an elements
+ */
+interface ITaggable
+{
+	refers Tag[] tags
+}
+
+/*
+ * INamed: Name attribute
+ */
+interface INamed
+{
+	@GenModel(propertyCategory="Basic", notify="true")
+	String name = ""
+
+	op INamed getNamedContainer() {
+		if (eContainer instanceof INamed) eContainer as INamed else null
+	}
+	
+	op String getNamePrefix() {
+		if (namespace === null) return "" else  AmaltheaExtensions.toPlainString(namePrefixSegments, defaultNameSeparator)
+	}
+
+	@GenModel(propertyCategory="Read only")
+	derived readonly String qualifiedName get { AmaltheaExtensions.toPlainString(qualifiedNameSegments, defaultNameSeparator) }
+
+	// Definition: [qualified name] = [name prefix] + [name]
+	
+	op String[] getQualifiedNameSegments() {
+		val segments = getNamePrefixSegments()
+		if (name !== null) segments.add(name)
+		return segments
+	}
+
+	// Default name separator for [name prefix] and [qualified name]
+
+	@GenModel(documentation="Overwrite this method to define a specific name separator.")
+	op String getDefaultNameSeparator() { "." }
+
+	// Default implementation of [name prefix]: use namespace if available
+	
+	op Namespace getNamespace() { null }
+	
+	@GenModel(documentation="Overwrite this method to define a specific prefix (used by name-based references).")
+	op String[] getNamePrefixSegments() { (namespace?.qualifiedNameSegments) ?: newBasicEList }
+}
+
+/*
+ * IReferable: Computed ID for name based references
+ */
+interface IReferable extends INamed
+{
+	op String getEncodedQualifiedName () { AmaltheaExtensions.toEncodedString(qualifiedNameSegments) }
+
+	// use IPropertySheetEntry.FILTER_ID_EXPERT ("org.eclipse.ui.views.properties.expert")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	id derived readonly String uniqueName get { encodedQualifiedName + "?type=" + eClass.name }
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+interface IDisplayName
+{
+	String displayName
+}
+
+interface IDescription
+{
+	@GenModel(propertyMultiLine="true")
+	String description
+}
+
+interface INamespaceMember {
+	@GenModel(propertyCategory="Basic", notify="true")
+	refers Namespace namespace
+}
+
+/*
+ * A tag for processes, runnables, events and labels
+ */
+class Tag extends ReferableBaseObject, IDescription
+{
+	String tagType
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of objects (ITaggable) referring to this tag.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived ITaggable[] taggedObjects get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.tag_TaggedObjects,
+			#{AmaltheaPackage.eINSTANCE.ITaggable_Tags}
+		)
+	}
+}
+
+class Namespace extends ReferableObject
+{
+	contains Namespace[] nextSegments opposite previousSegment
+
+	@GenModel(propertyCategory="Read only")
+	container readonly Namespace previousSegment opposite nextSegments
+
+	op String[] getNamePrefixSegments() { (previousSegment?.qualifiedNameSegments) ?: newBasicEList	}
+
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of objects (INamespaceMember) referring to this namespace.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived INamespaceMember[] memberObjects get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.namespace_MemberObjects,
+			#{AmaltheaPackage.eINSTANCE.INamespaceMember_Namespace}
+		)
+	}
+}
+
+enum RelationalOperator
+{
+	_undefined_ // Display: "<relation>"
+	EQUAL
+	NOT_EQUAL
+	LESS_THAN
+	LESS_THAN_OR_EQUAL
+	GREATER_THAN
+	GREATER_THAN_OR_EQUAL
+}
+
+/*
+ * Classifiers for hardware properties
+ */
+abstract class Classifier extends ReferableBaseObject, IDescription
+{
+}
+
+class CoreClassifier extends Classifier
+{
+}
+
+class MemoryClassifier extends Classifier
+{
+}
+
+/*
+ * Data transmission details for communication (e.g. LabelAccesses)
+ */
+class TransmissionPolicy
+{
+	contains DataSize chunkSize
+	int chunkProcessingTicks = "0"
+	double transmitRatio = "1.0"
+}
+
+/*
+ * Parameter type (e.g. for scheduling parameters)
+ */
+enum ParameterType
+{
+	_undefined_ // Display: "<parameter type>"
+	Integer
+	Float
+	Bool
+	String
+	Time
+}
+
+
+// -------------------------------------------------------------------------------
+//
+// 								Quantities
+//
+// -------------------------------------------------------------------------------
+
+/*
+ * Abstract class for Quantities (value + unit)
+ */
+abstract class Quantity {}
+
+/*
+ * Time units (enumeration of available units)
+ */
+enum TimeUnit
+{
+	_undefined_ // Display: "<unit>"
+	s
+	ms
+	us
+	ns
+	ps
+}
+
+interface TimeComparable wraps java.lang.Comparable<Time> {}
+
+/*
+ * General time class to define time value and unit.
+ */
+class Time extends Quantity, Value, TimeComparable
+{
+	BigInteger value = "0"
+	TimeUnit unit
+	
+	op String toString() {
+		return value + " " + if (unit == TimeUnit::_UNDEFINED_) "<unit>" else unit.literal
+	}
+	
+	op int compareTo(Time t) { return AmaltheaServices.compareTimes(this, t) }
+	
+	op Time adjustUnit() { return AmaltheaServices.adjustTimeUnit(this) }
+	op Time add(Time t) { return AmaltheaServices.addTime(this, t) }
+	op Time subtract(Time t) { return AmaltheaServices.subtractTime(this, t) }
+	op Time multiply(long v) { return AmaltheaServices.multiply(this, v) }
+	op Time multiply(double v) { return AmaltheaServices.multiply(this, v) }
+	op double divide(Time t) { return AmaltheaServices.divideTime(this, t) }
+}
+
+
+/*
+ * Frequency units (enumeration of available units)
+ */
+enum FrequencyUnit
+{
+	_undefined_ // Display: "<unit>"
+	Hz
+	kHz
+	MHz
+	GHz
+//	rpm ???
+}
+
+/*
+ * General frequency class to define frequency value and unit
+ */
+class Frequency extends Quantity
+{
+	NonNegativeDouble value = "0.0"
+	FrequencyUnit unit
+	
+	op String toString() {
+		return value + " " + if (unit == FrequencyUnit::_UNDEFINED_) "<unit>" else unit.literal
+	}
+}
+
+/*
+ * Voltage units (enumeration of available units)
+ */
+enum VoltageUnit
+{
+	_undefined_ // Display: "<unit>"
+	uV
+	mV
+	V
+}
+
+/*
+ * General voltage class to define voltage value and unit
+ */
+class Voltage extends Quantity
+{
+	double value = "0.0"
+	VoltageUnit unit
+	
+	op String toString() {
+		return value + " " + if (unit == VoltageUnit::_UNDEFINED_) "<unit>" else unit.literal
+	}
+}
+
+/*
+ * Data size units (enumeration of available units)
+ */
+enum DataSizeUnit
+{
+	_undefined_ // Display: "<unit>"
+	bit
+	kbit
+	Mbit
+	Gbit
+	Tbit
+	
+	Kibit
+	Mibit
+	Gibit
+	Tibit
+	
+	B
+	kB
+	MB
+	GB
+	TB
+	
+	KiB
+	MiB
+	GiB
+	TiB
+}
+
+/*
+ * General data size class to define size (value and unit)
+ */
+class DataSize extends Quantity
+{
+	BigInteger value = "0"
+	DataSizeUnit unit
+	
+	op String toString() {
+		return value + " " + if (unit == DataSizeUnit::_UNDEFINED_) "<unit>" else unit.literal
+	}
+	
+	/*
+	 * Convenience methods to retrieve the size in Bits and Bytes
+	 */
+	op long getNumberBits() {
+		if (unit === DataSizeUnit::BIT) return value.longValue
+		
+		val bits = AmaltheaServices.convertToBit(this)
+		if (bits === null) -1L else bits.longValue
+	}
+	op long getNumberBytes() {
+		if (unit === DataSizeUnit::B) return value.longValue
+		
+		val bits = AmaltheaServices.convertToBit(this)
+		if (bits === null) -1L else Math::ceil(bits.longValue / 8).longValue
+	}
+}
+
+/*
+ * Data rate units (enumeration of available units)
+ */
+enum DataRateUnit
+{
+	_undefined_ // Display: "<unit>"
+	bitPerSecond // Display: "bit/s"
+	kbitPerSecond
+	MbitPerSecond
+	GbitPerSecond
+	TbitPerSecond
+	
+	KibitPerSecond
+	MibitPerSecond
+	GibitPerSecond
+	TibitPerSecond
+	
+	BPerSecond
+	kBPerSecond
+	MBPerSecond
+	GBPerSecond
+	TBPerSecond
+	
+	KiBPerSecond
+	MiBPerSecond
+	GiBPerSecond
+	TiBPerSecond
+}
+
+interface DataRateComparable wraps java.lang.Comparable<DataRate> {}
+
+/*
+ * General data rate class to define rate (value and unit)
+ */
+class DataRate extends Quantity, DataRateComparable
+{
+	BigInteger value = "0"
+	DataRateUnit unit
+	
+	op String toString() {
+		return value + " " + if (unit == DataRateUnit::_UNDEFINED_) "<unit>" else unit.literal.replace("PerSecond", "/s")
+	}
+	op int compareTo(DataRate rate) {
+		return AmaltheaServices.compareDataRates(this, rate)
+	}
+}
+
+// -------------------------------------------------------------------------------
+//
+// 							Custom Properties and Values
+//
+// -------------------------------------------------------------------------------
+
+/*
+ * custom property container for map
+ */
+class CustomProperty wraps java.util.Map$Entry
+{
+	String[1] key
+	contains Value value
+}
+
+/*
+ * Abstract generalization of a value entry. 
+ */
+abstract class Value {}
+
+class ListObject extends Value
+{
+	contains Value[] values
+}
+
+/*
+ * @since 1.2
+ */
+class MapObject extends Value
+{
+	contains CustomProperty[] entries
+}
+
+/*
+ * Object for using the elementary datatype String as generic parameter.
+ */
+class StringObject extends Value
+{
+	@GenModel(propertyMultiLine="true")
+	String[1] value
+}
+
+/*
+ * Object for using the elementary datatype BigInteger as generic parameter.
+ */
+class BigIntegerObject extends Value
+{
+	BigInteger[1] value = "0"
+}
+
+/*
+ * Object for using object reference as generic parameter.
+ */
+class ReferenceObject extends Value
+{
+	refers IReferable value
+}
+
+/*
+ * Object for using the elementary datatype integer as generic parameter.
+ */
+class IntegerObject extends Value
+{
+	int[1] value = "0"
+}
+
+/*
+ * Object for using the elementary datatype long as generic parameter.
+ */
+class LongObject extends Value
+{
+	long[1] value = "0"
+}
+
+/*
+ * Object for using the elementary datatype float as generic parameter.
+ */
+class FloatObject extends Value
+{
+	float[1] value = "0.0"
+}
+
+/*
+ * Object for using the elementary datatype double as generic parameter.
+ */
+class DoubleObject extends Value
+{
+	double[1] value = "0.0"
+}
+
+/*
+ * Object for using the elementary datatype boolean as generic parameter.
+ */
+class BooleanObject extends Value
+{
+	boolean[1] value = "false"
+}
+
+// -------------------------------------------------------------------------------
+//
+// 						Statistics / Deviations (general)
+//
+// -------------------------------------------------------------------------------
+
+interface NumericStatistic {}
+
+/*
+ * Statistic to provide capabilities for min, max and avg
+ */
+class MinAvgMaxStatistic extends NumericStatistic
+{
+	int min = "0"
+	float avg = "0f"
+	int max = "0"
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+class SingleValueStatistic extends NumericStatistic
+{
+	float value = "0f"
+}
+
+/*
+ * The types of sampling
+ */
+enum SamplingType
+{
+	^default // Display: "<sampling>"
+	BestCase
+	WorstCase
+	AverageCase
+	CornerCase
+	Uniform
+}
+
+// -------------------------------------------------------------------------------
+//
+// 								Deviation of Time
+//
+// -------------------------------------------------------------------------------
+
+interface ITimeDeviation {
+	op Time getLowerBound()
+	op Time getUpperBound()
+	op Time getAverage()
+}
+
+abstract class TimeInterval {
+	contains Time[1] lowerBound
+	contains Time[1] upperBound
+	
+	op Time getAverage() {
+		AmaltheaServices2.getAverage(lowerBound, upperBound)
+	}
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+class TimeConstant extends ITimeDeviation {
+	contains Time[1] value
+	
+	op Time getLowerBound() { value }
+	op Time getUpperBound() { value }
+	op Time getAverage() { value }
+}
+
+class TimeHistogram extends ITimeDeviation {
+	contains TimeHistogramEntry[+] entries
+	
+	op Time getLowerBound() { AmaltheaServices2.getLowerBound_Time(entries) }
+	op Time getUpperBound() { AmaltheaServices2.getUpperBound_Time(entries) }
+	op Time getAverage() { AmaltheaServices2.getAverage_Time(entries) }
+}
+
+class TimeHistogramEntry extends TimeInterval {
+	PositiveLong[1] occurrences = "1"
+}
+
+abstract class BoundedTimeDistribution extends TimeInterval, ITimeDeviation {}
+
+abstract class TruncatedTimeDistribution extends ITimeDeviation {
+	contains Time lowerBound
+	contains Time upperBound
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+/*
+ * Defines the upper and lower bounds of a value interval without defining the distribution
+ */
+class TimeBoundaries extends BoundedTimeDistribution {
+	SamplingType samplingType
+}
+
+/*
+ * Defines the upper bound, lower bound and mean of a value interval without defining the distribution
+ */
+class TimeStatistics extends BoundedTimeDistribution {
+	contains Time[1] average
+}
+
+/*
+ * Uniform distribution
+ */
+class TimeUniformDistribution extends BoundedTimeDistribution {}
+
+/*
+ * Gauss distribution
+ */
+ class TimeGaussDistribution extends TruncatedTimeDistribution {
+	contains Time[1] mean
+	contains Time[1] sd
+	
+	op Time getAverage() {
+		return AmaltheaServices2.getAverageOfTruncatedNormalDistribution(lowerBound, upperBound, mean, sd)
+	}
+}
+
+/*
+ * Weibull Distribution
+ * The parameter of a Weibull distribution (kappa, lambda...) are calculated from the estimators minimum, maximum and average. 
+ */
+class TimeWeibullEstimatorsDistribution extends BoundedTimeDistribution {
+	contains Time[1] average
+	PositiveDouble[1] pRemainPromille = "1.0"
+}
+
+/*
+ * Beta distribution
+ */
+class TimeBetaDistribution extends BoundedTimeDistribution {
+	PositiveDouble[1] alpha = "1.0"
+	PositiveDouble[1] beta = "1.0"
+	
+	op Time getAverage() {
+		return AmaltheaServices2.getAverageOfBetaDistribution(lowerBound, upperBound, alpha, beta)
+	}
+}
+
+// -------------------------------------------------------------------------------
+//
+// 								Deviation of Long
+//
+// -------------------------------------------------------------------------------
+
+interface IDiscreteValueDeviation {
+	op Long getLowerBound()
+	op Long getUpperBound()
+	op Double getAverage()
+}
+
+abstract class DiscreteValueInterval {
+	Long[1] lowerBound = "0"
+	Long[1] upperBound = "0"
+	
+	op Double getAverage() {
+		AmaltheaServices2.getAverage(lowerBound, upperBound)
+	}
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+class DiscreteValueConstant extends IDiscreteValueDeviation {
+	long[1] value = "0"
+	
+	op Long getLowerBound() { value }
+	op Long getUpperBound() { value }
+	op Double getAverage() { value.doubleValue }
+}
+
+class DiscreteValueHistogram extends IDiscreteValueDeviation {
+	contains DiscreteValueHistogramEntry[+] entries
+	
+	op Long getLowerBound() { AmaltheaServices2.getLowerBound_DV(entries) }
+	op Long getUpperBound() { AmaltheaServices2.getUpperBound_DV(entries) }
+	op Double getAverage() { AmaltheaServices2.getAverage_DV(entries) }
+}
+
+class DiscreteValueHistogramEntry extends DiscreteValueInterval {
+	PositiveLong[1] occurrences = "1"
+}
+
+abstract class BoundedDiscreteValueDistribution extends DiscreteValueInterval, IDiscreteValueDeviation {}
+
+abstract class TruncatedDiscreteValueDistribution extends IDiscreteValueDeviation {
+	Long lowerBound		// initial value is null
+	Long upperBound		// initial value is null
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+/*
+ * Defines the upper and lower bounds of a value interval without defining the distribution
+ */
+class DiscreteValueBoundaries extends BoundedDiscreteValueDistribution {
+	SamplingType samplingType
+}
+
+/*
+ * Defines the upper bound, lower bound and mean of a value interval without defining the distribution
+ */
+class DiscreteValueStatistics extends BoundedDiscreteValueDistribution {
+	Double[1] average = "0.0"
+}
+
+/*
+ * Uniform distribution
+ */
+class DiscreteValueUniformDistribution extends BoundedDiscreteValueDistribution {}
+
+/*
+ * Gauss distribution
+ */
+ class DiscreteValueGaussDistribution extends TruncatedDiscreteValueDistribution {
+	double[1] mean = "0.0"
+	PositiveDouble[1] sd = "1.0"
+	
+	op Double getAverage() {
+		return AmaltheaServices2.getAverageOfTruncatedNormalDistribution(lowerBound, upperBound, mean, sd)
+	}
+}
+
+/*
+ * Weibull Distribution
+ * The parameter of a Weibull distribution (kappa, lambda...) are calculated from the estimators minimum, maximum and average. 
+ */
+class DiscreteValueWeibullEstimatorsDistribution extends BoundedDiscreteValueDistribution {
+	Double[1] average = "0.0"
+	PositiveDouble[1] pRemainPromille = "1.0"
+}
+
+/*
+ * Beta distribution
+ */
+class DiscreteValueBetaDistribution extends BoundedDiscreteValueDistribution {
+	PositiveDouble[1] alpha = "1.0"
+	PositiveDouble[1] beta = "1.0"
+	
+	op Double getAverage() {
+		return AmaltheaServices2.getAverageOfBetaDistribution(lowerBound, upperBound, alpha, beta)
+	}
+}
+
+// -------------------------------------------------------------------------------
+//
+// 								Deviation of Double
+//
+// -------------------------------------------------------------------------------
+
+interface IContinuousValueDeviation {
+	op Double getLowerBound()
+	op Double getUpperBound()
+	op Double getAverage()
+}
+
+abstract class ContinuousValueInterval {
+	Double[1] lowerBound = "0.0"
+	Double[1] upperBound = "0.0"
+	
+	op Double getAverage() {
+		AmaltheaServices2.getAverage(lowerBound, upperBound)
+	}
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+class ContinuousValueConstant extends IContinuousValueDeviation {
+	double[1] value = "0.0"
+	
+	op Double getLowerBound() { value }
+	op Double getUpperBound() { value }
+	op Double getAverage() { value }
+}
+
+class ContinuousValueHistogram extends IContinuousValueDeviation {
+	contains ContinuousValueHistogramEntry[+] entries
+	
+	op Double getLowerBound() { AmaltheaServices2.getLowerBound_CV(entries) }
+	op Double getUpperBound() { AmaltheaServices2.getUpperBound_CV(entries) }
+	op Double getAverage() { AmaltheaServices2.getAverage_CV(entries) }
+}
+
+class ContinuousValueHistogramEntry extends ContinuousValueInterval {
+	PositiveLong[1] occurrences = "1"
+}
+
+abstract class BoundedContinuousValueDistribution extends ContinuousValueInterval, IContinuousValueDeviation {}
+
+abstract class TruncatedContinuousValueDistribution extends IContinuousValueDeviation {
+	Double lowerBound		// initial value is null
+	Double upperBound		// initial value is null
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+/*
+ * Defines the upper and lower bounds of a value interval without defining the distribution
+ */
+class ContinuousValueBoundaries extends BoundedContinuousValueDistribution {
+	SamplingType samplingType
+}
+
+/*
+ * Defines the upper bound, lower bound and mean of a value interval without defining the distribution
+ */
+class ContinuousValueStatistics extends BoundedContinuousValueDistribution {
+	Double[1] average = "0.0"
+}
+
+/*
+ * Uniform distribution
+ */
+class ContinuousValueUniformDistribution extends BoundedContinuousValueDistribution {}
+
+/*
+ * Gauss distribution
+ */
+ class ContinuousValueGaussDistribution extends TruncatedContinuousValueDistribution {
+	double[1] mean = "0.0"
+	PositiveDouble[1] sd = "1.0"
+	
+	op Double getAverage() {
+		return AmaltheaServices2.getAverageOfTruncatedNormalDistribution(lowerBound, upperBound, mean, sd)
+	}
+}
+
+/*
+ * Weibull Distribution
+ * The parameter of a Weibull distribution (kappa, lambda...) are calculated from the estimators minimum, maximum and average. 
+ */
+class ContinuousValueWeibullEstimatorsDistribution extends BoundedContinuousValueDistribution {
+	Double[1] average = "0.0"
+	PositiveDouble[1] pRemainPromille = "1.0"
+}
+
+/*
+ * Beta distribution
+ */
+class ContinuousValueBetaDistribution extends BoundedContinuousValueDistribution {
+	PositiveDouble[1] alpha = "1.0"
+	PositiveDouble[1] beta = "1.0"
+	
+	op Double getAverage() {
+		return AmaltheaServices2.getAverageOfBetaDistribution(lowerBound, upperBound, alpha, beta)
+	}
+}
+
+// -------------------------------------------------------------------------------
+//
+// 										Modes
+//
+// -------------------------------------------------------------------------------
+
+abstract class Mode extends ReferableBaseObject {}
+
+class NumericMode extends Mode
+{
+	// future extensions (restrictions) possible, e.g. range
+}
+
+class EnumMode extends Mode
+{
+	contains ModeLiteral[] literals opposite containingMode
+	
+	op ModeLiteral getLiteral(String literal) {
+		literals.findFirst[it.name == literal]
+	}
+}
+
+class ModeLiteral extends ReferableBaseObject
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly EnumMode containingMode opposite literals
+
+	op String[] getNamePrefixSegments() { (containingMode?.qualifiedNameSegments) ?: newBasicEList  }
+
+	op String toString() {
+		if (name.nullOrEmpty) "<literal>" else name
+	}
+}
+
+// -------------------------------------------------------------------------------
+//
+// 										Datatypes
+//
+// -------------------------------------------------------------------------------
+
+/*
+ * Hardware Address (long; specified as hexadecimal value)
+ */
+@ExtendedMetaData(minInclusive="0")
+type Address wraps long
+create {
+	if (it === null) 
+		throw new NumberFormatException("Null")
+	else if (it.startsWith("-") || it.startsWith("+"))
+		throw new NumberFormatException("Sign character")
+ 	else
+		Long.decode(it)
+}
+convert {
+	"0x" + Long.toHexString(it)
+}
+
+//
+// Positive Numbers (value > 0): Integer (int), Long (long), Double (double)
+//
+ 
+@ExtendedMetaData(minExclusive="0")
+type PositiveInt wraps int
+
+@ExtendedMetaData(minExclusive="0")
+type PositiveLong wraps long
+
+@ExtendedMetaData(minExclusive="0")
+type PositiveDouble wraps double
+
+//
+// Non Negative Numbers(value >= 0): Integer (int), Long (long), Double (double)
+//
+ 
+@ExtendedMetaData(minInclusive="0")
+type NonNegativeInt wraps int
+
+@ExtendedMetaData(minInclusive="0")
+type NonNegativeLong wraps long
+
+@ExtendedMetaData(minInclusive="0")
+type NonNegativeDouble wraps double
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 								Components Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class ComponentsModel extends BaseObject, IComponentContainer, IInterfaceContainer
+{
+	contains ComponentStructure[] structures
+	contains System[] systems
+}
+
+interface IComponentContainer {
+		contains Component[] components
+}
+
+interface IInterfaceContainer {
+		contains MainInterface[] interfaces
+}
+
+interface ISystem
+{
+	contains ComponentInstance[] componentInstances opposite containingSystem
+	contains Connector[] connectors opposite containingSystem
+	contains QualifiedPort[] groundedPorts
+	
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers derived readonly QualifiedPort[] innerPorts get {
+		AmaltheaServices.getInnerPorts(this);
+	}
+}
+
+abstract class ComponentInterface extends ReferableBaseObject, ITaggable
+{
+	refers TypeDefinition datatype
+	contains SubInterface[] subInterfaces opposite containingInterface
+}
+
+@GenModel(labelFeature="qualifiedName")
+class MainInterface extends ComponentInterface, INamespaceMember, IComponentStructureMember
+{
+	String version = "1.0"
+}
+
+@GenModel(labelFeature="qualifiedName")
+class SubInterface extends ComponentInterface
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly ComponentInterface containingInterface opposite subInterfaces
+
+	op String[] getNamePrefixSegments() { (containingInterface?.qualifiedNameSegments) ?: newBasicEList }
+}
+
+class ComponentPort extends ReferableBaseObject, ITaggable
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly Component containingComponent opposite ports
+
+	op String[] getNamePrefixSegments() { (containingComponent?.qualifiedNameSegments) ?: newBasicEList }
+
+	InterfaceKind kind
+	refers ComponentInterface ^interface
+}
+
+@GenModel(labelFeature="qualifiedName")
+class ComponentStructure extends ReferableObject
+{
+	String structureType = ""
+	contains ComponentStructure[] subStructures
+
+	op ComponentStructure getContainingStructure() {
+		if (eContainer instanceof ComponentStructure) eContainer as ComponentStructure else null
+	}
+
+	op String getDefaultNameSeparator() { "::" }
+	op String[] getNamePrefixSegments() { (containingStructure?.qualifiedNameSegments) ?: newBasicEList }
+
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of objects (IComponentStructureMember) referring to this structure.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived IComponentStructureMember[] memberObjects get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.componentStructure_MemberObjects,
+			#{AmaltheaPackage.eINSTANCE.IComponentStructureMember_Structure}
+		)
+	}
+}
+
+interface IComponentStructureMember {
+	refers ComponentStructure structure
+}
+
+@GenModel(labelFeature="qualifiedName")
+class Component extends ReferableBaseObject, ITaggable, INamespaceMember, IComponentStructureMember
+{
+	contains ComponentPort[] ports opposite containingComponent
+
+	@GenModel(propertyCategory="Included SW Elements")
+	refers AbstractProcess[] processes
+	@GenModel(propertyCategory="Included SW Elements")
+	refers Runnable[] runnables
+	@GenModel(propertyCategory="Included SW Elements")
+	refers Label[] labels
+	@GenModel(propertyCategory="Included SW Elements")
+	refers Semaphore[] semaphores
+	@GenModel(propertyCategory="Included SW Elements")
+	refers OsEvent[] osEvents
+}
+
+class Composite extends Component, ISystem {}
+
+class System extends ReferableBaseObject, ITaggable, ISystem {}
+
+class ComponentInstance extends ReferableBaseObject, ITaggable
+{
+	container ISystem containingSystem opposite componentInstances
+
+	refers Component ^type
+
+	op String[] getNamePrefixSegments() { (namedContainer?.qualifiedNameSegments) ?: newBasicEList }
+}
+
+class Connector extends BaseObject, INamed, ITaggable
+{
+	container ISystem containingSystem opposite connectors
+
+	contains QualifiedPort sourcePort
+	contains QualifiedPort targetPort
+	
+	contains InterfaceChannel[] implementedInterfaces
+}
+
+class InterfaceChannel wraps java.util.Map$Entry
+{
+	refers ComponentInterface[1] key
+	refers Channel value
+}
+
+class QualifiedPort extends BaseObject
+{
+	refers ComponentInstance instance
+	refers ComponentPort[1] port
+}
+
+enum InterfaceKind
+{
+	_undefined_ // Display: "<kind>"
+	provides // Display: "PROVIDES"
+	requires // Display: "REQUIRES"
+	provides_requires // Display: "PROVIDES+REQUIRES"
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 								Config Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class ConfigModel extends BaseObject
+{
+	contains EventConfig[] eventsToTrace
+}
+
+class EventConfig extends BaseObject, INamed
+{
+	refers EntityEvent[1] event
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 								Constraints Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class ConstraintsModel extends BaseObject
+{
+	contains EventChain[] eventChains
+	contains TimingConstraint[] timingConstraints
+	contains AffinityConstraint[] affinityConstraints
+	contains RunnableSequencingConstraint[] runnableSequencingConstraints
+	contains DataAgeConstraint[] dataAgeConstraints
+	contains Requirement[] requirements
+	contains DataCoherencyGroup[] dataCoherencyGroups
+	contains DataStabilityGroup[] dataStabilityGroups
+	contains PhysicalSectionConstraint[] physicalSectionConstraints
+}
+
+enum RunnableOrderType{
+	_undefined_ // Display: "<order>"
+	successor
+	immediateSuccessorStartSequence
+	immediateSuccessorAnySequence
+	immediateSuccessorEndSequence
+}
+
+class RunnableSequencingConstraint extends ReferableBaseObject
+{
+	RunnableOrderType orderType
+	contains RunnableEntityGroup[2..*] runnableGroups
+	refers AbstractProcess[] processScope
+}
+
+abstract class AffinityConstraint extends ReferableBaseObject {}
+
+/*
+ * An abstract superclass for all separation constraints
+ */
+abstract class SeparationConstraint extends AffinityConstraint {}
+
+/*
+ * An abstract superclass for all pairing constraints
+ */
+abstract class PairingConstraint extends AffinityConstraint {}
+
+/*
+ * An abstract superclass for all process related constraint
+ * The target describes the entity on which the processes can be mapped
+ */
+abstract class ProcessConstraint
+{
+	contains ProcessConstraintTarget target
+}
+
+/*
+ * An abstract superclass for all runnable related constraint
+ * The target describes the entity on which the runnables can be mapped
+ */
+abstract class RunnableConstraint
+{
+	contains RunnableConstraintTarget target
+}
+
+/*
+ * An abstract superclass for all data related constraint
+ * The target describes the entity on which the data can be mapped
+ */
+abstract class DataConstraint
+{
+	contains DataConstraintTarget target
+}
+
+/*
+ * A runnable-separation-constraint
+ * groups describes the runnable-groups that should be separated from each other on the target
+ * if there is only one group then this means that the runnables of this group are not allowed to be executed on the target
+ */
+class RunnableSeparationConstraint extends SeparationConstraint, RunnableConstraint, BaseObject
+{
+	contains RunnableGroup[1..2] groups
+}
+
+/*
+ * A process-separation-constraint
+ * groups describes the process-groups that should be separated from each other on the target
+ * if there is only one group then this means that the processes of this group are not allowed to be executed on the target
+ */
+class ProcessSeparationConstraint extends SeparationConstraint, ProcessConstraint, BaseObject
+{
+	contains ProcessGroup[1..2] groups
+}
+
+/*
+ * A data-separation-constraint
+ * groups describes the label-groups that should be separated from each other on the target
+ * if there is only one group then this means that the label of this group is not allowed to be executed on the target
+ */
+class DataSeparationConstraint extends SeparationConstraint, DataConstraint, BaseObject
+{
+	contains LabelEntityGroup[1..2] groups
+}
+
+/*
+ * A runnable-pairing-constraint
+ * runnables describes the group of runnables that should be paired on the target
+ */
+class RunnablePairingConstraint extends PairingConstraint, RunnableConstraint, BaseObject
+{
+	contains RunnableGroup[1] group
+}
+
+/*
+ * A process-pairing-constraint
+ * processes describes the group of processes that should be paired on the target
+ */
+class ProcessPairingConstraint extends PairingConstraint, ProcessConstraint, BaseObject
+{
+	contains ProcessGroup[1] group
+}
+
+/*
+ * A data-pairing-constraint
+ * labels describes the group of labels that should be paired on the target
+ */
+class DataPairingConstraint extends PairingConstraint, DataConstraint, BaseObject
+{
+	contains LabelGroup[1] group
+}
+
+/*
+ * An abstract superclass for all possible targets for runnable-constraints
+ */
+abstract class RunnableConstraintTarget {}
+
+/*
+ * An abstract superclass for all possible targets for process-constraints
+ */
+abstract class ProcessConstraintTarget {}
+
+/*
+ * An abstract superclass for all possible targets for data-constraints
+ */
+abstract class DataConstraintTarget {}
+
+/*
+ * A memory target description
+ * A memory can be a target for data-constraints
+ * memories: the reference to zero or more Memories. If this list is empty, the target stands for all memories! 
+ */
+class TargetMemory extends DataConstraintTarget, BaseObject
+{
+	refers Memory[] memories
+}
+
+/*
+ * A core target description
+ * A core can be a target for runnable-constraints, process-constraints and scheduler-constraints
+ * cores: the reference to zero or more Cores. If this list is empty, the target stands for all cores! 
+ */
+class TargetCore extends RunnableConstraintTarget, ProcessConstraintTarget, BaseObject
+{
+	refers ProcessingUnit[] cores
+}
+
+/*
+ * A scheduler target description
+ * A scheduler can be a target for runnable-constraints and process-constraints
+ * schedulers: the reference to zero or more Schedulers. If this list is empty, the target stands for all schedulers! 
+ */
+class TargetScheduler extends RunnableConstraintTarget, ProcessConstraintTarget, BaseObject
+{
+	refers Scheduler[] schedulers
+}
+
+/*
+ * An abstract description for a group of labels that can be paired or separated by a runnable-constraint
+ */
+abstract class LabelGroup {}
+
+/*
+ * An abstract description for a group of runnables that can be paired or separated by a runnable-constraint
+ */
+abstract class RunnableGroup {}
+
+/*
+ * An abstract description for a group of processes that can be paired or separated by a process-constraint
+ */
+abstract class ProcessGroup {}
+
+/*
+ * A group of labels that can be paired or separated by a data-constraint
+ */
+class LabelEntityGroup extends LabelGroup, BaseObject
+{
+	refers Label[1..*] labels
+}
+
+/*
+ * A group of runnables that can be paired or separated by a runnable-constraint
+ */
+class RunnableEntityGroup extends RunnableGroup, BaseObject
+{
+	refers Runnable[1..*] runnables
+}
+
+/*
+ * A group of processes that can be paired or separated by a process-constraint
+ */
+class ProcessEntityGroup extends ProcessGroup, BaseObject
+{
+	refers Process[1..*] processes
+}
+
+/*
+ * A group that contains only a tag and groups all objects that are marked with this tag
+ * This can be runnables or processes
+ */
+class TagGroup extends RunnableGroup, ProcessGroup, BaseObject
+{
+	refers Tag[1] tag
+}
+
+//////////////////////////Event chains & Timing constraints:
+/*
+ * Describes an event chain which must have a minimum of two events (stimulus and response)
+ * If there are more events the event chain have to be divided into segments. Each segment is another event chain.
+ * Alternative event paths are contained in strands.
+ * stimulus: Beginning of chain
+ * response: End of chain
+ * segments: Sub event chains
+ * strands: alternative event paths
+ */
+abstract class AbstractEventChain extends BaseObject, INamed
+{
+	refers Event[1] stimulus
+	refers Event[1] response
+	contains EventChainItem[] items
+	EventChainItemType itemType
+	PositiveInt minItemsCompleted = "1"
+}
+
+enum EventChainItemType
+{
+	_undefined_ // Display: "<item type>"
+	sequence
+	parallel
+}
+
+class EventChain extends AbstractEventChain, IReferable {}
+
+class SubEventChain extends AbstractEventChain {}
+
+interface EventChainItem
+{
+	op AbstractEventChain getEventChain()
+}
+
+class EventChainReference extends BaseObject, EventChainItem
+{
+	refers EventChain[1] eventChain
+}
+
+class EventChainContainer extends BaseObject, EventChainItem
+{
+	contains SubEventChain[1] eventChain
+}
+
+abstract class TimingConstraint extends ReferableBaseObject {}
+
+/*
+ * This contraints is used to limit a section in Memories
+ */
+class PhysicalSectionConstraint extends ReferableBaseObject
+{
+	refers Section[1] section
+	refers Memory[+] memories
+}
+
+/*
+ * Base class for synchronization constraints, which limit the distance between events
+ * multipleOccurrencesAllowed: Defines whether multiple event occurrences are allowed for analysis
+ * tolerance: Maximum allowed tolerance
+ */
+abstract class SynchronizationConstraint extends TimingConstraint
+{
+	boolean multipleOccurrencesAllowed = "false"
+	contains Time[1] tolerance
+}
+
+/*
+ * The synchronization constraint considers a group of events and limits the distance of the events within this group.
+ */
+class EventSynchronizationConstraint extends SynchronizationConstraint
+{
+	refers EntityEvent[+] events
+}
+
+enum SynchronizationType
+{
+	_undefined_ // Display: "<synchronization>"
+	Stimulus
+	Response
+}
+
+/*
+ * A synchronization constraint describes the allowed tolerance in synchronization between two event chains
+ * scope: Considered event chains that have to by in sync
+ * type: Defines which parts of the event chains have to be in sync
+ */
+class EventChainSynchronizationConstraint extends SynchronizationConstraint
+{
+	refers EventChain[2] scope
+	SynchronizationType ^type
+}
+
+enum MappingType
+{
+	_undefined_ // Display: "<mapping>"
+	OneToOne
+	Reaction
+	UniqueReaction
+}
+
+/*
+ * This constraint describes how a source and a target event are placed relative to each other
+ */
+class DelayConstraint extends TimingConstraint
+{
+	MappingType mappingType
+	refers EntityEvent[1] source
+	refers EntityEvent[1] target
+	contains Time upper
+	contains Time lower
+}
+
+enum LatencyType
+{
+	_undefined_ // Display: "<latency>"
+	Age
+	Reaction
+}
+
+/*
+ * A latency constraint describes the allowed range in latency between a stimulus and its response.
+ * scope: Considered event chain that defines the stimulus and response relation
+ * type: Defines the point of view (forward or backward)
+ * minimum: Minimum allowed latency
+ * maximum: Maximum allowed latency
+ */
+class EventChainLatencyConstraint extends TimingConstraint
+{
+	refers EventChain[1] scope
+	LatencyType ^type
+	contains Time minimum
+	contains Time maximum
+}
+
+/*
+ * A repetition constraint prescribes the distribution of a single event during runtime.
+ */
+class RepetitionConstraint extends TimingConstraint
+{
+	refers EntityEvent[1] event
+	int span = "0"
+	contains Time lower
+	contains Time upper
+	contains Time jitter
+	contains Time period
+}
+
+//////////////////////////Data Age Constraint
+class DataAgeConstraint extends ReferableBaseObject
+{
+	refers Runnable[1] runnable
+	refers Label[1] label
+	contains DataAge[1] dataAge
+}
+
+abstract class DataAge {}
+
+class DataAgeCycle extends DataAge
+{
+	int minimumCycle = "0"
+	int maximumCycle = "0"
+}
+
+class DataAgeTime extends DataAge
+{
+	contains Time minimumTime
+	contains Time maximumTime
+}
+
+////////////////////////// Requirements
+abstract class Requirement extends BaseObject, INamed
+{
+	Severity severity
+	contains RequirementLimit[1] limit
+}
+
+class ProcessRequirement extends Requirement
+{
+	refers AbstractProcess[1] process
+}
+
+class RunnableRequirement extends Requirement
+{
+	refers Runnable[1] runnable
+}
+
+class ArchitectureRequirement extends Requirement
+{
+	refers Component[1] component
+}
+
+class ProcessChainRequirement extends Requirement
+{
+	refers ProcessChain[1] processChain
+}
+
+abstract class RequirementLimit
+{
+	LimitType limitType
+}
+
+class CPUPercentageRequirementLimit extends RequirementLimit
+{
+	CPUPercentageMetric metric
+	double limitValue = "0.0"
+	// can be ECU, Processor or Core
+	refers ProcessingUnit hardwareContext
+}
+
+class FrequencyRequirementLimit extends RequirementLimit
+{
+	FrequencyMetric metric
+	contains Frequency[1] limitValue
+}
+
+class PercentageRequirementLimit extends RequirementLimit
+{
+	PercentageMetric metric
+	double limitValue = "0.0"
+}
+
+class CountRequirementLimit extends RequirementLimit
+{
+	CountMetric metric
+	int limitValue = "0"
+}
+
+class TimeRequirementLimit extends RequirementLimit
+{
+	TimeMetric metric
+	// signed time is allowed because the requirement to lateness can be negative
+	contains Time[1] limitValue
+}
+
+enum Severity
+{
+	_undefined_ // Display: "<severity>"
+	Cosmetic
+	Minor
+	Major
+	Critical
+}
+
+enum LimitType
+{
+	_undefined_ // Display: "<limit>"
+	UpperLimit
+	LowerLimit
+}
+
+enum TimeMetric
+{
+	_undefined_ // Display: "<time metric>"
+	ActivateToActivate
+	CoreExecutionTime
+	EndToEnd
+	EndToStart
+	GrossExecutionTime
+	Lateness
+	MemoryAccessTime
+	NetExecutionTime
+	OsOverhead
+	ParkingTime
+	PollingTime
+	ReadyTime
+	ResponseTime
+	RunningTime
+	StartDelay
+	StartToStart
+	WaitingTime
+}
+
+enum CountMetric
+{
+	_undefined_ // Display: "<count metric>"
+	Activations
+	BoundedMigrations
+	CacheHit
+	CacheMiss
+	FullMigrations
+	MtaLimitExceeding
+	Preemptions
+}
+
+enum PercentageMetric
+{
+	_undefined_ // Display: "<% metric>"
+	CacheHitRatio
+	CacheMissRatio
+	CoreExecutionTimeRelative
+	MemoryAccessTimeRelative
+	NormalizedLateness
+	NormalizedResponseTime
+	OsOverheadRelative
+}
+
+enum CPUPercentageMetric
+{
+	_undefined_ // Display: "<CPU % metric>"
+	CPUBuffering
+	CPULoad
+	CPUParking
+	CPUPolling
+	CPUReady
+	CPURunning
+	CPUWaiting
+}
+
+enum FrequencyMetric
+{
+	_undefined_ // Display: "<frequency metric>"
+	CacheHitFrequency
+	CacheMissFrequency
+}
+
+//////////////////////////// Data Groups (Coherency and Stability)
+class DataCoherencyGroup extends ReferableBaseObject
+{
+	refers Label[+] labels
+	contains DataGroupScope scope
+	CoherencyDirection direction
+}
+
+enum CoherencyDirection
+{
+	_undefined_ // Display: "<direction>"
+	input
+	output
+}
+
+class DataStabilityGroup extends ReferableBaseObject
+{
+	refers Label[+] labels
+	contains DataGroupScope scope
+}
+
+abstract class DataGroupScope {}
+
+class ProcessScope extends DataGroupScope
+{
+	refers AbstractProcess process
+}
+
+class RunnableScope extends DataGroupScope
+{
+	refers Runnable runnable
+}
+
+class ComponentScope  extends DataGroupScope
+{
+	refers Component component
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									Events Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class EventModel extends BaseObject
+{
+	contains Event[] events
+}
+
+/*
+ * An abstract event
+ */
+abstract class Event extends ReferableBaseObject, ITaggable, IDescription
+{
+}
+
+/*
+ * A set of entity-events
+ */
+class EventSet extends Event
+{
+	refers EntityEvent[+] events
+}
+
+/*
+ * An abstract event that describes the notification of a changed state of an entity
+ */
+abstract class EntityEvent extends Event {}
+
+/*
+ * Defines Events to be used in Stimuli as trigger.
+ */
+abstract class TriggerEvent extends EntityEvent
+{
+}
+
+class CustomEvent extends TriggerEvent
+{
+	String eventType
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of triggers (CustomEventTrigger).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived CustomEventTrigger[] explicitTriggers get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.customEvent_ExplicitTriggers, 
+			#{AmaltheaPackage.eINSTANCE.customEventTrigger_Event} )
+	}
+}
+
+/*
+ * Describes the event of a stimulus. 
+ * It contains only the stimulus but no event type because a stimulus has only one event type.
+ */
+class StimulusEvent extends EntityEvent
+{
+	refers Stimulus entity
+}
+
+/*
+ * Describes the event of a process
+ * eventType: The type of the Event
+ * entity: The process that fires the event (optional)
+ * processingUnit: The processing unit that executes the process when the event is fired (optional) 
+ */
+class ProcessEvent extends EntityEvent
+{
+	ProcessEventType eventType
+	refers Process entity
+	refers ProcessingUnit processingUnit
+}
+
+/*
+ * Describes the event of some process within a process chain
+ * eventType: The type of the Event
+ * entity: The process that fires the event (optional)
+ * processingUnit: The processing unit that executes the process when the event is fired (optional) 
+ */
+class ProcessChainEvent extends EntityEvent
+{
+	ProcessEventType eventType
+	refers ProcessChain entity
+	refers ProcessingUnit processingUnit
+}
+
+/*
+ * Describes the event of a runnable
+ * eventType: The type of event
+ * entity: The runnable that fires the event (optional)
+ * process: The process that executes the runnable (optional)
+ * processingUnit: The processing unit that executes the runnable (executes the process that calls the runnable) (optional) 
+ */
+class RunnableEvent extends TriggerEvent
+{
+	RunnableEventType eventType
+	refers Runnable entity
+	refers Process process
+	refers ProcessingUnit processingUnit
+}
+
+/*
+ * Describes the event of a label access
+ * eventType: The type of event
+ * entity: The accessed label that fires the event (optional)
+ * runnable: The runnable that accesses the label (optional)
+ * process: The process that accesses the label (optional)
+ */
+class LabelEvent extends TriggerEvent
+{
+	LabelEventType eventType
+	refers Label entity
+	refers Runnable runnable
+	refers Process process
+}
+
+/*
+ * Describes the event of a mode label access
+ * eventType: The type of event
+ * entity: The accessed mode label that fires the event
+ * runnable: The runnable that accesses the mode label (optional)
+ * process: The process that accesses the mode label (optional)
+ */
+class ModeLabelEvent extends TriggerEvent
+{
+	ModeLabelEventType eventType
+	refers ModeLabel entity
+	refers Runnable runnable
+	refers Process process
+}
+
+/*
+ * Describes the event of a channel access
+ * eventType: The type of event
+ * entity: The accessed channel that fires the event (optional)
+ * runnable: The runnable that accesses the label (optional)
+ * process: The process that accesses the label (optional)
+ */
+class ChannelEvent extends TriggerEvent
+{
+	ChannelEventType eventType
+	refers Channel entity
+	refers Runnable runnable
+	refers Process process
+}
+
+/*
+ * Describes the event of a semaphore access
+ * eventType: The type of event
+ * entity: The accessed semaphore that fires the event (optional)
+ * runnable: The runnable that accesses the semaphore (optional)
+ * process: The process that accesses the semaphore (optional)
+ * processingUnit: The processing unit that executes the process/runnable that accesses the semaphore (optional)
+ */
+class SemaphoreEvent extends EntityEvent
+{
+	SemaphoreEventType eventType
+	refers Semaphore entity
+	refers Runnable runnable
+	refers Process process
+	refers ProcessingUnit processingUnit
+}
+
+/*
+ * Describes the event of a component
+ * eventType: The type of event
+ * entity: The component that fires the event (optional)
+ */
+class ComponentEvent extends EntityEvent
+{
+	ComponentEventType eventType
+	refers Component entity
+}
+
+/*
+ * The types of a process event
+ */
+enum ProcessEventType
+{
+	_all_
+	activate
+	start
+	resume
+	preempt
+	poll
+	run
+	wait
+	poll_parking
+	park
+	release_parking
+	release
+	terminate
+}
+
+/*
+ * The types of a runnable event
+ */
+enum RunnableEventType
+{
+	_all_
+	start
+	suspend
+	resume
+	terminate
+}
+
+/*
+ * The types of a label event
+ */
+enum LabelEventType
+{
+	_all_
+	read
+	write
+}
+
+/*
+ * The types of a mode label event
+ */
+enum ModeLabelEventType
+{
+	_all_
+	read
+	write
+	increment
+	decrement
+}
+
+/*
+ * The types of a label event
+ */
+enum ChannelEventType
+{
+	_all_
+	send
+	receive
+}
+
+/*
+ * The types of a semaphore event
+ */
+enum SemaphoreEventType
+{
+	_all_
+	lock
+	unlock
+}
+
+/*
+ * The types of a component event
+ */
+enum ComponentEventType
+{
+	_all_
+	start
+	end
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									HW Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class HWModel extends BaseObject
+{
+	contains HwDefinition[] definitions
+	contains HwFeatureCategory[] featureCategories
+	contains HwStructure[] structures
+	contains HwDomain[] domains
+}
+
+class HwStructure extends ReferableBaseObject, ITaggable
+{
+	StructureType structureType
+	contains HwPort[] ports
+	contains HwStructure[] structures
+	contains HwModule[] modules
+	contains HwConnection[] connections
+	
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers derived readonly HwPort[] innerPorts get {
+		AmaltheaServices.getInnerPorts(this);
+	}
+}
+
+abstract class HwModule extends ReferableBaseObject, ITaggable
+{
+	contains HwPort[] ports
+	refers PowerDomain powerDomain
+	refers FrequencyDomain frequencyDomain
+}
+
+abstract class HwDomain extends ReferableBaseObject, ITaggable {}
+
+class FrequencyDomain extends HwDomain
+{
+	// contains Frequency[] possibleValues
+	contains Frequency defaultValue
+	boolean clockGating = "false"
+}
+
+class PowerDomain extends HwDomain
+{
+	// contains Voltage[] possibleValues
+	contains Voltage defaultValue
+	boolean powerGating = "false"
+}
+
+class ProcessingUnit extends HwModule, HwDestination, HwPathElement
+{
+	refers ProcessingUnitDefinition definition
+	contains HwAccessElement[] accessElements opposite source
+	contains Cache[] caches
+}
+
+class Memory extends HwModule, HwDestination
+{
+	refers MemoryDefinition definition
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of mappings (MemoryMapping).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived MemoryMapping[] mappings get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.memory_Mappings,
+			#{AmaltheaPackage.eINSTANCE.memoryMapping_Memory} )
+	}
+}
+
+enum MemoryType
+{
+	_undefined_
+	DRAM
+	SRAM
+	FLASH
+	PCM
+}
+
+class Cache extends HwModule, HwPathElement
+{
+	refers CacheDefinition definition
+}
+
+class HwFeatureCategory extends ReferableBaseObject, IDescription
+{
+	HwFeatureType featureType
+	contains HwFeature[] features opposite containingCategory
+}
+
+class HwFeature extends ReferableBaseObject
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly HwFeatureCategory containingCategory opposite features
+
+	op String[] getNamePrefixSegments() { (containingCategory?.qualifiedNameSegments) ?: newBasicEList }
+	
+	op String toString() {
+		val featureName = containingCategory?.name
+		return (if (featureName.nullOrEmpty) "<category>" else featureName) + "::" + (if (name.nullOrEmpty) "<feature>" else name)
+	}
+	
+	double value = "0.0"
+}
+
+class HwPort extends ReferableBaseObject, ITaggable
+{
+	op String[] getNamePrefixSegments() { (namedContainer?.qualifiedNameSegments) ?: newBasicEList }
+	
+	int bitWidth = "0"
+	int priority = "0"
+	PortType portType
+	PortInterface portInterface
+	
+	@GenModel(propertyCategory="Read only")
+	derived readonly boolean delegated get {
+		eContainer instanceof HwStructure
+	}
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of connections (HwConnection).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived HwConnection[] connections get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.hwPort_Connections,
+			#{AmaltheaPackage.eINSTANCE.hwConnection_Port1, AmaltheaPackage.eINSTANCE.hwConnection_Port2}
+		)
+	}
+
+}
+
+class ConnectionHandler extends HwModule, HwPathElement
+{
+	refers ConnectionHandlerDefinition definition
+	contains HwConnection[] internalConnections
+}
+
+class HwConnection extends ReferableBaseObject, HwPathElement, ITaggable
+{
+	op String[] getNamePrefixSegments() { (namedContainer?.qualifiedNameSegments) ?: newBasicEList }
+	
+	@GenModel(documentation="<p><b>Read latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation readLatency
+	@GenModel(documentation="<p><b>Write latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation writeLatency
+	contains DataRate dataRate
+	refers HwPort port1
+	refers HwPort port2
+	
+	@GenModel(propertyCategory="Read only")
+	derived readonly boolean internal get {
+		eContainer instanceof ConnectionHandler
+	}
+	
+	op HwPort[] getPorts() {
+		return newArrayList(port1, port2).filterNull.toEList.unmodifiableEList
+	}
+}
+
+class HwAccessElement extends ITaggable, INamed
+{
+	// container (read only)
+	@GenModel(propertyCategory="Read only")
+	container readonly ProcessingUnit source opposite accessElements
+	
+	refers HwDestination[1] destination
+	contains HwAccessPath accessPath opposite containingAccessElement
+	@GenModel(documentation="<p><b>Read latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation readLatency
+	@GenModel(documentation="<p><b>Write latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation writeLatency
+	contains DataRate dataRate
+}
+
+enum StructureType
+{
+	_undefined_
+	System
+	ECU
+	Microcontroller
+	SoC
+	Cluster
+	Group
+	Array
+	Area
+	Region
+}
+
+enum CacheType
+{
+	_undefined_
+	instruction
+	data
+	unified
+}
+
+enum PortType
+{
+	_undefined_
+	initiator // master
+	responder // slave
+}
+
+enum SchedPolicy
+{
+	_undefined_
+	RoundRobin
+	FCFS
+	PriorityBased
+}
+
+enum WriteStrategy
+{
+	_undefined_
+	none
+	writeback
+	writethrough
+}
+
+abstract class HwDefinition extends ReferableBaseObject, ITaggable {}
+
+class ProcessingUnitDefinition extends HwDefinition
+{
+	PuType puType
+	refers HwFeature[] features
+	refers CoreClassifier[] classifiers // backward compatibility
+}
+
+class ConnectionHandlerDefinition extends HwDefinition
+{
+	SchedPolicy policy
+	@GenModel(documentation="<p><b>Read latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation readLatency
+	@GenModel(documentation="<p><b>Write latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation writeLatency
+	contains DataRate dataRate
+	PositiveInt maxBurstSize = "1"
+	PositiveInt maxConcurrentTransfers = "1"
+}
+
+class MemoryDefinition extends HwDefinition
+{
+	contains DataSize size
+	@GenModel(documentation="<p><b>Access latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation accessLatency
+	contains DataRate dataRate
+	MemoryType memoryType
+	refers MemoryClassifier[] classifiers // backward compatibility
+}
+
+class CacheDefinition extends HwDefinition
+{
+	contains DataSize size
+	contains DataSize lineSize
+	@GenModel(documentation="<p><b>Access latency [cycles]</b></p>")
+	contains IDiscreteValueDeviation accessLatency
+	CacheType cacheType
+	WriteStrategy writeStrategy
+	int nWays = "0"
+	boolean coherency = "false"
+	boolean exclusive = "false"
+	double hitRate = "0.0"
+}
+
+abstract class HwPath
+{
+	op HwAccessElement getContainingAccessElement() {}
+	
+	@GenModel(propertyCategory="Read only")
+	refers derived readonly ProcessingUnit source get {
+		return containingAccessElement.source
+	}
+	@GenModel(propertyCategory="Read only")
+	refers derived readonly HwDestination destination get {
+		return containingAccessElement.destination
+	}
+}
+
+class HwAccessPath extends HwPath, INamed
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly HwAccessElement containingAccessElement opposite accessPath
+	
+	refers HwPathElement[+] pathElements
+	Address startAddress = "0"
+	Address endAddress = "0"
+	Address memOffset = "0"
+}
+
+interface HwPathElement extends IReferable
+{
+	op HwPort[] getPorts()
+}
+
+interface HwDestination extends IReferable
+{
+	op HwPort[] getPorts()
+}
+
+enum PuType
+{
+	_undefined_
+	GPU
+	CPU
+	Accelerator
+}
+
+enum PortInterface
+{
+	_undefined_
+	custom
+	CAN
+	Flexray
+	LIN
+	MOST
+	Ethernet
+	SPI			// Serial Peripheral Interface
+	I2C			// Inter-Integrated Circuit
+	AXI			// Advanced eXtensible Interface
+	AHB			// Advanced High-performance Bus
+	APB			// Advanced Peripheral Bus
+	SWR			// Serial WireRing
+}
+
+enum HwFeatureType
+{
+	_undefined_
+	performance
+	power
+	performance_and_power
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									Mapping Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class MappingModel extends BaseObject
+{
+	contains SchedulerAllocation[] schedulerAllocation
+	contains RunnableAllocation[] runnableAllocation
+	contains TaskAllocation[] taskAllocation
+	contains ISRAllocation[] isrAllocation
+	contains MemoryMapping[] memoryMapping
+	contains PhysicalSectionMapping[] physicalSectionMapping
+	MemoryAddressMappingType addressMappingType
+}
+
+/*
+ * Defines how to interpret the memory addresses in this mapping model
+ */
+enum MemoryAddressMappingType
+{
+	_undefined_ // Display: "<address type>"
+	// no addresses required
+	none
+	// absolute memory address
+	address
+	// offset from first address of memory
+	offset
+}
+
+//////////////// Generalizations for the Allocations (assignment to cores)
+/*
+ * Allocation of Schedulers
+ */
+class SchedulerAllocation extends BaseObject
+{
+	refers Scheduler[1] scheduler
+	refers ProcessingUnit[+] responsibility
+	refers ProcessingUnit executingPU
+}
+
+//////////////// Specializations of Allocations
+class TaskAllocation extends BaseObject, ISchedulingParameterContainer
+{
+	refers Task[1] task
+	refers TaskScheduler[1] scheduler
+	refers ProcessingUnit[] affinity
+}
+
+class ISRAllocation extends BaseObject
+{
+	refers ISR[1] isr
+	refers InterruptController[1] controller
+	Integer priority
+}
+
+class RunnableAllocation extends BaseObject
+{
+	refers Scheduler[1] scheduler
+	refers Runnable[1] entity
+}
+
+//////////////// Specializations of Mappings
+/*
+ * Mapping of AbstractMemoryElement (Label, Runnable, ISR, Task, ...) 
+ * to a specific memory.
+ */
+class MemoryMapping extends BaseObject
+{
+	refers AbstractMemoryElement[1] abstractElement
+	refers Memory[1] memory
+	/*
+	 * The position of the element in the mapped memory
+	 */
+	Address memoryPositionAddress = "0"
+}
+
+class PhysicalSectionMapping extends ReferableBaseObject
+{
+	@GenModel(propertyCategory="Basic")
+	refers Section[+] origin
+	@GenModel(propertyCategory="Memory")
+	refers Memory[1] memory
+	@GenModel(propertyCategory="Memory")
+	Address startAddress = "0"
+	@GenModel(propertyCategory="Memory")
+	Address endAddress	= "0"
+	refers Label[] labels
+	refers Runnable[] runEntities
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									OS Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class OSModel extends BaseObject
+{
+	contains Semaphore[] semaphores
+	contains OperatingSystem[] operatingSystems
+
+	contains OsOverhead[] osOverheads
+	contains SchedulerDefinition[] schedulerDefinitions
+	contains SchedulingParameterDefinition[] schedulingParameterDefinitions
+}
+
+class OsDataConsistency extends BaseObject
+{
+	OsDataConsistencyMode mode
+	contains DataStability dataStability
+	contains NonAtomicDataCoherency nonAtomicDataCoherency
+}
+
+class DataStability
+{
+	boolean enabled = "false"
+	String algorithm
+	AccessMultiplicity accessMultiplicity
+	DataStabilityLevel level
+}
+
+class NonAtomicDataCoherency
+{
+	boolean enabled = "false"
+	String algorithm
+	AccessMultiplicity accessMultiplicity
+}
+
+enum OsDataConsistencyMode
+{
+	_undefined_ // Display: "<data consistency mode>"
+	noProtection
+	automaticProtection
+	customProtection
+	handledByModelElements
+}
+
+enum AccessMultiplicity
+{
+	_undefined_ // Display: "<access multiplicity>"
+	singleAccess
+	multipleAccesses
+}
+
+enum DataStabilityLevel
+{
+	_undefined_ // Display: "<data stability level>"
+	period // between consecutive occurrences
+	process // within a Task or ISR
+	scheduleSection // between Schedule points (explicit schedule points, begin and end of process)
+	runnable // within a Runnable
+}
+
+/*
+ * name: Name of semaphore
+ * maxValue: maximum number of users which can access the semaphore simultaneously
+ * initialValue: number of users which access semaphore at system startup
+ * priorityCeilingProtocol: enables priority ceiling for this resource
+
+ */
+class Semaphore extends ReferableBaseObject
+{
+	SemaphoreType semaphoreType
+	NonNegativeInt initialValue = "0"
+	PositiveInt maxValue = "1"
+	boolean priorityCeilingProtocol = "false"
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of accesses (SemaphoreAccess).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived SemaphoreAccess[] semaphoreAccesses get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.semaphore_SemaphoreAccesses,
+			#{AmaltheaPackage.eINSTANCE.semaphoreAccess_Semaphore} )
+	}
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of components the semaphore belongs to.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Component[] referringComponents get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.semaphore_ReferringComponents,
+			#{AmaltheaPackage.eINSTANCE.component_Semaphores} )
+	}
+}
+
+enum SemaphoreType
+{
+	_undefined_ // Display: "<semaphore type>"
+	CountingSemaphore
+	Resource
+	Spinlock
+}
+
+/*
+ * Scheduler
+ * <ul>
+ * <li>definition: determines algorithm for scheduling and its required parameters</li>
+ * <li>schedulingParameters: current values for global scheduling parameters</li>
+ * <li>computation items: steps to perform the scheduling algorithm</li>
+ * </ul>
+ */
+abstract class Scheduler extends ReferableBaseObject, ISchedulingParameterContainer
+{
+	refers SchedulerDefinition definition
+
+	contains ComputationItem[] computationItems
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of scheduler allocations (SchedulerAllocation).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived SchedulerAllocation[] schedulerAllocations get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.scheduler_SchedulerAllocations,
+			#{AmaltheaPackage.eINSTANCE.schedulerAllocation_Scheduler} )
+	}
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of runnable allocations (RunnableAllocation).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived RunnableAllocation[] runnableAllocations get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.scheduler_RunnableAllocations,
+			#{AmaltheaPackage.eINSTANCE.runnableAllocation_Scheduler} )
+	}
+}
+
+class TaskScheduler extends Scheduler
+{
+	contains SchedulerAssociation parentAssociation opposite child
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of child associations (SchedulerAssociation).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived SchedulerAssociation[] childAssociations get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.taskScheduler_ChildAssociations,
+			#{AmaltheaPackage.eINSTANCE.schedulerAssociation_Parent} )
+	}
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of task allocations (TaskAllocation).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived TaskAllocation[] taskAllocations get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.taskScheduler_TaskAllocations,
+			#{AmaltheaPackage.eINSTANCE.taskAllocation_Scheduler} )
+	}
+	
+	@GenModel(propertyCategory="Read only")
+	refers derived readonly TaskScheduler parentScheduler get {
+		return parentAssociation?.parent
+	}
+	
+	@GenModel(propertyCategory="Read only")
+	refers derived readonly TaskScheduler[] childSchedulers get {
+		val result = childAssociations.map[child].filterNull
+		return new UnmodifiableEList(this as InternalEObject, AmaltheaPackage.eINSTANCE.taskScheduler_ChildSchedulers,
+			result.size, result.toList.toArray)
+	}
+}
+
+class SchedulerAssociation extends ISchedulingParameterContainer
+{
+	// container (read only)
+	@GenModel(propertyCategory="Read only")
+	container readonly TaskScheduler child opposite parentAssociation
+	
+	refers TaskScheduler parent
+}
+
+class InterruptController extends Scheduler
+{
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of ISR allocations (ISRAllocation).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived ISRAllocation[] isrAllocations get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.interruptController_IsrAllocations,
+			#{AmaltheaPackage.eINSTANCE.ISRAllocation_Controller} )
+	}
+}
+
+//
+// OS definitions: Scheduling algorithms, Scheduling parameters, Overheads
+//
+
+abstract class OsDefinition extends ReferableBaseObject, ITaggable {}
+
+class SchedulerDefinition extends OsDefinition, IDescription
+{
+	@GenModel(propertyCategory="Parameters")
+	refers SchedulingParameterDefinition[] algorithmParameters
+	@GenModel(propertyCategory="Parameters")
+	refers SchedulingParameterDefinition[] processParameters
+
+	@GenModel(propertyCategory="Options")
+	boolean requiresParentScheduler = "false"
+	@GenModel(propertyCategory="Options")
+	boolean passesParametersUpwards = "false"
+	@GenModel(propertyCategory="Options")
+	boolean hasExactlyOneChild = "false"
+}
+
+class SchedulingParameterDefinition extends OsDefinition
+{
+	ParameterType ^type
+	boolean many = "false"
+	boolean mandatory = "true"
+	contains Value defaultValue
+
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of scheduler definitions from which this parameter definition is used.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived SchedulerDefinition[] schedulerDefinitions get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.schedulingParameterDefinition_SchedulerDefinitions,
+			#{AmaltheaPackage.eINSTANCE.schedulerDefinition_AlgorithmParameters, AmaltheaPackage.eINSTANCE.schedulerDefinition_ProcessParameters} )
+	}
+}
+
+interface ISchedulingParameterContainer {
+	contains SchedulingParameter[] schedulingParameters
+}
+
+class SchedulingParameter wraps java.util.Map$Entry
+{
+	@GenModel(notify="true")
+	refers SchedulingParameterDefinition[1] key
+	contains Value[1] value
+}
+
+class OsOverhead extends OsDefinition
+{
+	contains OsAPIOverhead apiOverhead
+	contains OsISROverhead isrCategory1Overhead
+	contains OsISROverhead isrCategory2Overhead
+}
+
+class OsAPIOverhead extends BaseObject
+{
+	contains Ticks apiSendMessage
+	contains Ticks apiTerminateTask
+	contains Ticks apiSchedule
+	contains Ticks apiRequestResource
+	contains Ticks apiReleaseResource
+	contains Ticks apiSetEvent
+	contains Ticks apiWaitEvent
+	contains Ticks apiClearEvent
+	contains Ticks apiActivateTask
+	contains Ticks apiEnforcedMigration
+	contains Ticks apiSuspendOsInterrupts
+	contains Ticks apiResumeOsInterrupts
+	contains Ticks apiRequestSpinlock
+	contains Ticks apiReleaseSpinlock
+	contains Ticks apiSenderReceiverRead
+	contains Ticks apiSenderReceiverWrite
+	contains Ticks apiSynchronousServerCallPoint
+	contains Ticks apiIocRead
+	contains Ticks apiIocWrite
+}
+
+class OsISROverhead extends BaseObject
+{
+	contains Ticks preExecutionOverhead
+	contains Ticks postExecutionOverhead
+}
+
+
+//
+// Operating systems
+//
+
+class OperatingSystem extends BaseObject, INamed
+{
+	refers OsOverhead overhead
+	contains TaskScheduler[] taskSchedulers
+	contains InterruptController[] interruptControllers
+	contains OsDataConsistency osDataConsistency
+}
+
+class VendorOperatingSystem extends OperatingSystem
+{
+	String osName
+	String vendor
+	String version
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 								Property Constraints Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class PropertyConstraintsModel extends BaseObject
+{
+	contains CoreAllocationConstraint[] allocationConstraints
+	contains MemoryMappingConstraint[] mappingConstraints
+}
+
+/*
+ * Abstract Class, used to describe Constraints for Allocations
+ * (these usually target Cores and their features/attributes)
+ */
+abstract class CoreAllocationConstraint extends BaseObject
+{
+	contains CoreClassification coreClassification
+}
+
+/*
+ * Abstract Class, used to describe Constraints for Mapping
+ * (these usually target Memories and their features/attributes)
+ */
+abstract class MemoryMappingConstraint extends BaseObject
+{
+	contains MemoryClassification memoryClassification
+}
+
+/*
+ * ProcessAllocationConstraints describe the constraints for
+ * Process-to-Core allocations
+ */
+class ProcessAllocationConstraint extends CoreAllocationConstraint
+{
+	refers Process process
+}
+
+/*
+ * ProcessPrototypeAllocationConstraints describe the constraints for
+ * ProcessPrototype-to-Core allocations
+ */
+class ProcessPrototypeAllocationConstraint extends CoreAllocationConstraint
+{
+	refers ProcessPrototype processPrototype
+}
+
+/*
+ * RunnableAllocationConstraints describe the constraints for
+ * Runnable-to-Core allocations
+ */
+class RunnableAllocationConstraint extends CoreAllocationConstraint
+{
+	refers Runnable runnable
+}
+
+/*
+ * AbstractElementMappingConstraints describe the constraints for 
+ * AbstractMemoryElement-to-Memory Mapping
+ */
+class AbstractElementMappingConstraint extends MemoryMappingConstraint
+{
+	refers AbstractMemoryElement abstractElement
+}
+
+/*
+ * Generalization for all Hardware related constraints
+ */
+abstract class Classification extends BaseObject
+{
+	CombinatorialCondition condition
+	GroupingType grouping
+}
+
+enum CombinatorialCondition
+{
+	_undefined_ // Display: "<condition>"
+	requires
+	excludes
+}
+
+enum GroupingType{
+	_undefined_ // Display: "<grouping>"
+	allOfThem
+	atLeastOneOfThem
+}
+
+class CoreClassification extends Classification
+{
+	refers CoreClassifier[] classifiers
+}
+
+class MemoryClassification extends Classification
+{
+	refers MemoryClassifier[] classifiers
+}
+
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									Stimuli Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+class StimuliModel extends BaseObject
+{
+	contains Stimulus[] stimuli
+	contains Clock[] clocks
+}
+
+/*
+ * Every process/task can have one or more stimuli.
+ * A stimulus activates the process
+ */
+abstract class Stimulus extends ReferableBaseObject, ITaggable
+{
+	contains ModeValueList setModeValueList
+	contains ConditionDisjunction executionCondition
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of affected processes (Process).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Process[] affectedProcesses get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.stimulus_AffectedProcesses,
+			#{AmaltheaPackage.eINSTANCE.process_Stimuli} )
+	}
+}
+
+class ModeValueList extends BaseObject
+{
+	contains ModeAssignment[] entries
+}
+
+class ModeValueMapEntry wraps java.util.Map$Entry
+{
+	refers ModeLabel[1] key
+	String[1] value
+}
+
+abstract class ModeValue extends BaseObject {
+	refers ModeLabel[1] label
+	String[1] value
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+
+	op ModeLiteral getLiteral() {
+		if (value === null) return null
+		val mode = label?.mode
+		if (mode instanceof EnumMode) {mode.literals.findFirst[name == value]} else {null}
+	}
+
+	op Integer getInteger() {
+		if (value === null) return null
+		val mode = label?.mode
+		if (mode instanceof NumericMode && value.matches("-?\\d+")) {Integer.parseInt(value)} else {null}
+	}
+}
+
+class ModeAssignment extends ModeValue {
+}
+
+// ===== Mode Conditions =====
+
+
+interface ISatisfiable {
+	op boolean isSatisfiedBy(ModeValueMapEntry[] context) 
+}
+
+class ModeConditionDisjunction extends BaseObject, ISatisfiable
+{
+	contains ModeConditionDisjunctionEntry[+] entries
+	
+	op boolean isSatisfiedBy(ModeValueMapEntry[] context) {
+		for (ModeConditionDisjunctionEntry entry : entries) {
+			if (entry.isSatisfiedBy(context)) return true;
+		}
+		return false;
+	}
+}
+
+interface ModeConditionDisjunctionEntry extends ISatisfiable {}
+
+class ModeConditionConjunction extends BaseObject, ModeConditionDisjunctionEntry
+{
+	contains ModeCondition[+] entries
+	
+	op boolean isSatisfiedBy(ModeValueMapEntry[] context) {
+		for (ModeCondition entry : entries) {
+			if (! entry.isSatisfiedBy(context)) return false;
+		}
+		return true;
+	}
+}
+
+abstract class ModeCondition extends Condition, ModeConditionDisjunctionEntry {
+	RelationalOperator relation
+}
+
+class ModeValueCondition extends ModeValue, ModeCondition
+{
+	op boolean isSatisfiedBy(ModeValueMapEntry[] context) {
+		// no value defined => satisfied (don't care)
+		val labelValue = context?.get(label)
+		return (labelValue === null) || (labelValue == value)
+	}
+}
+
+class ModeLabelCondition extends BaseObject, ModeCondition
+{
+	refers ModeLabel[1] label1
+	refers ModeLabel[1] label2
+
+	op boolean isSatisfiedBy(ModeValueMapEntry[] context) {
+		// no value defined => satisfied (don't care)
+		val labelValue1 = context?.get(label1)
+		val labelValue2 = context?.get(label2)
+		return (labelValue1 === null) || (labelValue2 === null) || (labelValue1 == labelValue2)
+	}
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+
+// ===== Conditions (general) =====
+
+class ConditionDisjunction extends BaseObject
+{
+	contains ConditionDisjunctionEntry[+] entries
+}
+
+interface ConditionDisjunctionEntry {}
+
+class ConditionConjunction extends BaseObject, ConditionDisjunctionEntry
+{
+	contains Condition[+] entries
+}
+
+abstract class Condition extends ConditionDisjunctionEntry {}
+
+class ChannelFillCondition extends BaseObject, Condition
+{
+	refers Channel[1] channel
+	RelationalOperator relation
+	NonNegativeInt fillLevel
+}
+
+
+// ===== Stimuli =====
+
+/*
+ * Stimulus that is triggered periodically.
+ * offset: Time of first occurrence
+ * recurrence: Time between following occurrences
+ */
+interface FixedPeriodic
+{
+	contains Time[1] recurrence
+	contains Time offset
+}
+
+/*
+ * Stimulus that is triggered periodically.
+ * jitter: Deviation from true periodicity to real occurrence
+ * minDistance: Minimal time between occurrences
+ */
+class PeriodicStimulus extends Stimulus, FixedPeriodic
+{
+	contains ITimeDeviation jitter
+	contains Time minDistance
+}
+
+/*
+ * Stimulus that is triggered relative to the previous occurrence.
+ * offset: Time of first occurrence
+ * step: Time (Deviation) between successive occurrences
+ */
+class RelativePeriodicStimulus extends Stimulus
+{
+	contains Time offset
+	contains ITimeDeviation[1] nextOccurrence
+}
+
+/*
+ * Periodic stimulus based on other events, like rotation speed
+ * clock: Time base which defines deviation of time, multiple stimuli can have the same time base
+ */
+class VariableRateStimulus extends Stimulus
+{
+	contains Time[1] step
+	contains IContinuousValueDeviation[1] occurrencesPerStep
+	Double maxIncreasePerStep		// initial value is null
+	Double maxDecreasePerStep		// initial value is null
+	contains Scenario scenario
+}
+
+class Scenario extends BaseObject
+{
+	refers Clock[1] clock
+	
+	NonNegativeDouble samplingOffset = "0.0"
+	NonNegativeDouble samplingRecurrence = "1.0"
+}
+
+/*
+ * Stimulus (repeated periodically) with a defined list of occurrences.
+ * occurrenceTimes: List of all occurrences
+ */
+class PeriodicSyntheticStimulus extends Stimulus, FixedPeriodic
+{
+	contains Time[+] occurrenceTimes
+}
+
+/*
+ * Stimulus to describe own custom types, including properties.
+ */
+class CustomStimulus extends Stimulus, IDescription
+{
+}
+
+/*
+ * Single occurrence at a defined time.
+ */
+class SingleStimulus extends Stimulus
+{
+	contains Time[1] occurrence
+}
+
+/*
+ * Stimulus based on a explicit inter process trigger.
+ */
+class InterProcessStimulus extends Stimulus
+{
+	contains Counter counter
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of triggers (InterProcessTrigger).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived InterProcessTrigger[] explicitTriggers get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.interProcessStimulus_ExplicitTriggers,
+			#{AmaltheaPackage.eINSTANCE.interProcessTrigger_Stimulus} )
+	}
+}
+
+/*
+ * Stimulus  (repeated periodically) for burst occurrences
+ * burstLength: Time frame for the burst (occurrences after the length are clipped)
+ */
+class PeriodicBurstStimulus extends Stimulus, FixedPeriodic
+{
+	contains Time[1] burstLength
+	contains Time occurrenceMinDistance
+	PositiveInt occurrenceCount = "1"
+}
+
+/*
+ * Stimulus which is activated by an event.
+ */
+class EventStimulus extends Stimulus
+{
+	refers TriggerEvent[+] triggeringEvents
+	contains Counter counter
+}
+
+/*
+ * Arrival Curve Stimulus
+ */
+class ArrivalCurveStimulus extends Stimulus
+{
+	contains ArrivalCurveEntry[+] entries
+}
+
+class ArrivalCurveEntry extends BaseObject
+{
+	PositiveInt numberOfOccurrences = "1"
+	contains Time lowerTimeBorder
+	contains Time upperTimeBorder
+}
+
+/*
+ * Within a Scenario a Clock defines the predefined curve progression in a simulation
+ */
+abstract class Clock extends ReferableBaseObject {}
+
+class ClockFunction extends Clock
+{
+	CurveType curveType
+	contains Time[1] period
+	contains Frequency[1] peakToPeak // amplitude
+	contains Time xOffset
+	contains Frequency yOffset
+}
+
+
+enum CurveType
+{
+	_undefined_ // Display: "<curve type>"
+	sine
+	triangle
+}
+
+class ClockStepList extends Clock
+{
+	contains ClockStep[+] entries
+	contains Time period
+}
+
+class ClockStep extends BaseObject
+{
+	contains Frequency[1] frequency
+	contains Time[1] time
+}
+
+
+// ===============================================================================
+// ===============================================================================
+// 
+// 									SW Model
+// 
+// ===============================================================================
+// ===============================================================================
+
+
+/*
+ * Central instance to provide central access. 
+ */
+class SWModel extends BaseObject
+{
+	contains ISR[] isrs
+	contains Task[] tasks
+	contains Runnable[] runnables
+	contains Label[] labels
+	contains Channel[] channels
+	contains ProcessPrototype[] processPrototypes
+	contains Section[] sections
+	contains Activation[] activations
+	contains OsEvent[] events
+	contains TypeDefinition[] typeDefinitions
+	contains CustomEntity[] customEntities
+	contains ProcessChain[] processChains
+	contains Mode[] modes
+	contains ModeLabel[] modeLabels
+	op ModeLiteral modeLiteral(String mode, String literal) {
+		if (mode.isNullOrEmpty || literal.isNullOrEmpty) return null
+		return (modes?.findFirst[it instanceof EnumMode && it.name == mode] as EnumMode)?.literals?.findFirst[it.name == literal]
+	}
+}
+
+abstract class AbstractMemoryElement extends ReferableBaseObject, ITaggable
+{
+	/*
+	 * Specifying the size of the element corresponding to the needed memory allocation
+	 */
+	contains DataSize size
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of mappings (MemoryMapping).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived MemoryMapping[] mappings get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.abstractMemoryElement_Mappings,
+			#{AmaltheaPackage.eINSTANCE.memoryMapping_AbstractElement} )
+	}
+}
+
+abstract class AbstractProcess extends AbstractMemoryElement
+{
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of components the abstract process belongs to.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Component[] referringComponents get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.abstractProcess_ReferringComponents,
+			#{AmaltheaPackage.eINSTANCE.component_Processes} )
+	}	
+}
+
+/*
+ * Possibility to define general custom elements
+ */
+class CustomEntity extends AbstractMemoryElement, IDescription
+{
+	String typeName
+}
+
+/*
+ * Groups a list of processes to a process chain.
+ * This does not define how the processes are chained, like being executed by one parent or like they trigger each other
+ * This just defines that the processes should be chained.
+ */
+class ProcessChain extends ReferableBaseObject 
+{
+	refers Process[] processes
+}
+
+/*
+ * @since 1.2
+ */
+interface IExecutable
+{
+	contains LocalModeLabel[] localLabels opposite containingExecutable
+	contains ActivityGraph activityGraph
+}
+
+/*
+ * Generalizes interrupt service routines and tasks
+ */
+abstract class Process extends AbstractProcess, IExecutable
+{
+	refers Stimulus[] stimuli
+}
+
+interface IActivityGraphItemContainer
+{
+	contains ActivityGraphItem[] items
+}
+
+
+/*
+ * Describes the different execution paths of a process or runnable
+ */
+class ActivityGraph extends BaseObject, IActivityGraphItemContainer {}
+
+/*
+ * An abstract item of a ActivityGraph.
+ */
+abstract class ActivityGraphItem extends BaseObject
+{
+	// container (read only)
+	/*
+	 * @since 1.2
+	 */
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers local readonly derived IExecutable containingExecutable get {
+		AmaltheaServices.getContainerOfType(this, IExecutable)
+	}
+	
+	// container (read only)
+	/*
+	 * @deprecated Use getContainingExecutable() instead.
+	 */
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers local readonly derived Process containingProcess get {
+		AmaltheaServices.getContainerOfType(this, Process)
+	}
+	
+	// container (read only)
+	/*
+	 * @deprecated Use getContainingExecutable() instead.
+	 */
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers local readonly derived Runnable containingRunnable get {
+		AmaltheaServices.getContainerOfType(this, Runnable)
+	}
+	
+	// container (read only)
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers local readonly derived ActivityGraph containingActivityGraph get {
+		AmaltheaServices.getContainerOfType(this, ActivityGraph)
+	}
+}
+
+/*
+ * A switch in the ActivityGraph, the selected path depends on the value of the provided mode conditions.
+ * 
+ * @deprecated Use more general Switch instead.
+ */
+class ModeSwitch extends ActivityGraphItem
+{
+	contains ModeSwitchEntry[] entries
+	contains ModeSwitchDefault defaultEntry
+}
+
+/*
+ * A switch entry for a ModeSwitch. 
+ * It describes a path of the switch and the required mode condition to use this path.
+ */
+class ModeSwitchEntry extends BaseObject, INamed, IActivityGraphItemContainer
+{
+	contains ModeConditionDisjunction[1] condition
+}
+
+class ModeSwitchDefault extends BaseObject, IActivityGraphItemContainer {}
+
+/*
+ * A switch in the ActivityGraph, the selected path depends on the value of the provided mode conditions.
+ * 
+ * @since 2.0
+ */
+class Switch extends ActivityGraphItem
+{
+	contains SwitchEntry[] entries
+	contains SwitchDefault defaultEntry
+}
+
+/*
+ * A switch entry for a Switch. 
+ * It describes a path of the switch and the required mode condition to use this path.
+ */
+class SwitchEntry extends BaseObject, INamed, IActivityGraphItemContainer
+{
+	contains ConditionDisjunction[1] condition
+}
+
+class SwitchDefault extends BaseObject, IActivityGraphItemContainer {}
+
+/*
+ * A switch in the ActivityGraph, each path has a probability.
+ */
+class ProbabilitySwitch extends ActivityGraphItem
+{
+	contains ProbabilitySwitchEntry[] entries
+}
+
+/*
+ * A switch entry for a ProbabilitySwitch.
+ * It describes a path of the switch and it's probability.
+ */
+class ProbabilitySwitchEntry extends BaseObject, IActivityGraphItemContainer
+{
+	double probability = "0.0"
+}
+
+/*
+ * A While loop in the ActivityGraph.
+ * The (repeated) execution depends on the value of the provided mode conditions.
+ * 
+ * @since 1.2
+ */
+class WhileLoop extends ActivityGraphItem, IActivityGraphItemContainer
+{
+	contains ConditionDisjunction[1] condition
+}
+
+/*
+ * A counter for the call sequence items
+ */
+class Counter extends BaseObject
+{
+	PositiveLong prescaler = "1"
+	NonNegativeLong offset = "0"
+}
+
+/*
+ * Let the process wait for a combination of events defined by eventMask
+ * maskType defines if the events in eventMask are linked by a AND or OR
+ */
+class WaitEvent extends ActivityGraphItem
+{
+	contains EventMask eventMask
+	WaitEventType maskType
+	WaitingBehaviour waitingBehaviour
+	
+	contains Counter counter
+}
+
+enum WaitEventType
+{
+	_undefined_ // Display: "<wait event>"
+	AND
+	OR
+}
+
+enum WaitingBehaviour
+{
+	_undefined_ // Display: "<waiting>"
+	active
+	passive
+}
+
+/*
+ * Sets the events of eventMask 
+ * These events can be set for a specific process, if there is no process, is is global (for all processes)
+ * If there is a process, it is possible to set the event for a specific process instance that is currently activated
+ */
+class SetEvent extends ActivityGraphItem
+{
+	contains EventMask eventMask
+	refers Process process
+	
+	contains Counter counter
+}
+
+/*
+ * Clears the events of eventMask
+ */
+class ClearEvent extends ActivityGraphItem
+{
+	contains EventMask eventMask
+	
+	contains Counter counter
+}
+
+/*
+ * A event mask
+ */
+class EventMask extends BaseObject
+{
+	refers OsEvent[] events
+}
+
+/*
+ * A event that can be set, cleared and waited for by a process 
+ */
+class OsEvent extends ReferableBaseObject, ITaggable
+{
+	int communicationOverheadInBit = "0"
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of components the OS event belongs to.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Component[] referringComponents get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.osEvent_ReferringComponents,
+			#{AmaltheaPackage.eINSTANCE.component_OsEvents} )
+	}
+}
+
+/*
+ * Triggers a stimulus to activate its processes
+ */
+class InterProcessTrigger extends ActivityGraphItem
+{
+	refers InterProcessStimulus[1] stimulus
+	
+	contains Counter counter
+}
+
+/*
+ * Migrates task to core of resource owner
+ */
+class EnforcedMigration extends ActivityGraphItem
+{
+	refers TaskScheduler[1] resourceOwner
+}
+
+/*
+ * Triggers scheduler
+ */
+class SchedulePoint extends ActivityGraphItem
+{
+}
+
+/*
+ * Terminates the process
+ */
+class TerminateProcess extends ActivityGraphItem
+{
+	contains Counter counter
+}
+
+/*
+ * Schedulable entity, which is managed by the OS. An instance of a Task is mapped to exactly one core
+ * and includes the direct representation of all abstractions.
+ */
+class Task extends Process
+{
+	Preemption preemption
+	int multipleTaskActivationLimit = "0"
+}
+
+/*
+ * Interrupt service routine
+ */
+class ISR extends Process
+{
+	ISRCategory category
+}
+
+enum ISRCategory
+{
+	_undefined_ // Display: "<isr category>"
+	CATEGORY_1
+	CATEGORY_2
+}
+
+/*
+ * Prototype class for Process. 
+ * It does contain meta information of potential processes, which does not represent the final state.
+ * The final state can be several Tasks, which can be computed using provided information of this prototype.
+ */
+class ProcessPrototype extends AbstractProcess
+{
+	Preemption preemption
+	refers Runnable firstRunnable
+	refers Runnable lastRunnable
+	/*
+	 * Defines the general label accesses
+	 */
+	contains AccessPrecedenceSpec[] accessPrecedenceSpec
+	/*
+	 * Defines the general order of runnables
+	 */
+	contains OrderPrecedenceSpec[] orderPrecedenceSpec
+	contains ChainedProcessPrototype[] chainedPrototypes
+	refers Activation activation
+	contains RunnableCall[] runnableCalls
+}
+
+class ChainedProcessPrototype extends BaseObject
+{
+	refers ProcessPrototype[1] prototype
+	int apply = "0"
+	int offset = "0"
+}
+
+/*
+ * General abstraction for precedence
+ */
+abstract class GeneralPrecedence extends BaseObject
+{
+	refers Runnable origin
+	refers Runnable target
+}
+
+/*
+ * 
+ */
+class AccessPrecedenceSpec extends GeneralPrecedence
+{
+	refers Label[1] label
+	AccessPrecedenceType orderType
+}
+
+/*
+ * Defines the access precedence at the time of one task period.
+ */
+enum AccessPrecedenceType
+{
+	_undefined_ // Display: "<access>"
+	/*
+	 * Writer of label has to be performed before the reader.
+	 */
+	defaultWR
+	/*
+	 * Dependency between writer and reader can be ignored.
+	 */
+	ignoreWR
+	/*
+	 * Reader of label has to be performed before the writer (delay unit of controller).
+	 */
+	enforceRW
+}
+
+/*
+ * 
+ */
+class OrderPrecedenceSpec extends GeneralPrecedence
+{
+	OrderType orderType
+}
+
+enum OrderType
+{
+	_undefined_ // Display: "<order>"
+	/*
+	 * Defines a general order, the included elements must not follow directly
+	 */
+	order
+	/*
+	 * The defined elements must follow directly
+	 */
+	directOrder
+	startSequence
+	endSequence
+}
+
+enum DirectionType
+{
+	_undefined_ // Display: "<direction>"
+	in
+	out
+	inout	
+}
+
+interface IDependsOn {
+	contains DataDependency dependsOn
+}
+
+class DataDependency extends BaseObject 
+{
+	refers Label[] labels
+	refers RunnableParameter[] parameters
+	refers CallArgument[] callArguments
+	
+	// container (read only)
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers local readonly derived Runnable containingRunnable get {
+		AmaltheaServices.getContainerOfType(this, Runnable)
+	}
+}
+
+class RunnableParameter extends ReferableBaseObject, IDependsOn
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly Runnable containingRunnable opposite parameters
+
+	op String[] getNamePrefixSegments() { (containingRunnable?.qualifiedNameSegments) ?: newBasicEList }
+	
+	DirectionType direction
+	refers TypeDefinition dataType
+	
+	op String toString() {
+		val runName = containingRunnable?.name
+		return (if (runName.nullOrEmpty) "<runnable>" else runName) + "::" + (if (name.nullOrEmpty) "<parameter>" else name)
+	}	
+}
+
+
+/*
+ * Smallest allocatable unit, which provides additional (optional) attributes for allocation algorithms.
+ */
+@GenModel(labelFeature="qualifiedName")
+class Runnable extends AbstractMemoryElement, IExecutable, INamespaceMember
+{
+	contains ConditionDisjunction executionCondition
+	contains RunnableParameter[] parameters opposite containingRunnable
+	refers Activation[] activations
+	
+	op ActivityGraphItem[] getRunnableItems() {
+		if (activityGraph === null) activityGraph = AmaltheaFactory.eINSTANCE.createActivityGraph()
+		activityGraph.items
+	}
+	op Activation getFirstActivation() {
+		activations.head
+	}
+	/*
+	 * Marker if runnable is used as callback.
+	 */
+	boolean callback = "false"
+	/*
+	 * Marker if runnable is used as a service.
+	 */
+	boolean service = "false"
+	/*
+	 * ASIL level for the runnable entity
+	 */
+	ASILType asilLevel
+	
+	refers Section section
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of callers (RunnableCalls).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived RunnableCall[] runnableCalls get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.runnable_RunnableCalls,
+			#{AmaltheaPackage.eINSTANCE.runnableCall_Runnable} )
+	}
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of components the runnable belongs to.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Component[] referringComponents get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.runnable_ReferringComponents,
+			#{AmaltheaPackage.eINSTANCE.component_Runnables} )
+	}
+}
+
+/*
+ * Data representation, which can be accessed by run entities.
+ */
+@GenModel(labelFeature="qualifiedName")
+class Label extends AbstractMemoryElement, IDisplayName, INamespaceMember
+{
+	contains DataType dataType
+	/*
+	 * Defines the label as a constant, not modifiable entity
+	 */
+	boolean constant = "false"
+	/*
+	 * Defines if the label value is volatile or persistent to survive shutdown and start of system
+	 */
+	boolean bVolatile = "false"
+	/*
+	 * Defines the data stability needs of the label
+	 */
+	LabelDataStability dataStability
+	DataStabilityLevel stabilityLevel
+	
+	refers Section section
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of accesses (LabelAccess).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived LabelAccess[] labelAccesses get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.label_LabelAccesses,
+			#{AmaltheaPackage.eINSTANCE.labelAccess_Data} )
+	}
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of components the label belongs to.</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Component[] referringComponents get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.label_ReferringComponents,
+			#{AmaltheaPackage.eINSTANCE.component_Labels} )
+	}
+
+}
+
+@GenModel(labelFeature="qualifiedName")
+class Channel extends AbstractMemoryElement, IDisplayName, INamespaceMember
+{
+	contains DataType elementType
+	int defaultElements = "0"
+	int maxElements = "0"
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of accesses (ChannelAccess).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived ChannelAccess[] channelAccesses get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.channel_ChannelAccesses,
+			#{AmaltheaPackage.eINSTANCE.channelAccess_Data} )
+	}
+}
+
+class ModeLabel extends AbstractMemoryElement, IDisplayName {
+	refers Mode[1] mode
+	String initialValue
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+
+	op boolean isEnum() {mode instanceof EnumMode}
+	op boolean isNumeric() {mode instanceof NumericMode}
+}
+
+
+enum LabelDataStability
+{
+	_undefined_ // Display: "<data stability>"
+	noProtection
+	automaticProtection
+	customProtection
+	handledByModelElements
+}
+
+/*
+ * A section is a logical structure, which contains labels and abstract run entities.
+ * It is used to provide an easy mechanism to distribute objects to memory, 
+ * which are belonging together.
+ */
+class Section extends ReferableBaseObject
+{
+	/*
+	 * for specifying the ASIL level for the "virtual memory sections"
+	 */
+	ASILType asilLevel
+	
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of labels (Label).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Label[] labels get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.section_Labels,
+			#{AmaltheaPackage.eINSTANCE.label_Section} )
+	}
+	// back pointer (readonly)
+	@GenModel(documentation="<p><b>Returns an <em>immutable</em> list of runnables (Runnable).</b></p>")
+	@GenModel(propertyCategory="Read only", propertyFilterFlags="org.eclipse.ui.views.properties.expert")
+	refers transient readonly volatile derived Runnable[] runnables get {
+		AmaltheaIndex.getInverseReferences(this, AmaltheaPackage.eINSTANCE.section_Runnables,
+			#{AmaltheaPackage.eINSTANCE.runnable_Section} )
+	}
+}
+
+/*
+ * Representation of a object that describes computation
+ */
+abstract class ComputationItem extends ActivityGraphItem {}
+
+/*
+ * Representation of the execution needs of a Runnable (default and core-specific)
+ */
+class ExecutionNeed extends ActivityGraphItem
+{
+	contains NeedEntry[] needs
+}
+
+class NeedEntry wraps java.util.Map$Entry
+{
+	String[1] key	//	refers to HwFeatureCategory
+	contains IDiscreteValueDeviation[1] value
+}
+
+/*
+ * Representation of the execution IDiscreteValueDeviation of a Runnable (default and core-specific)
+ */
+class Ticks extends ComputationItem {
+	contains IDiscreteValueDeviation ^default
+	contains TicksEntry[] extended
+}
+
+class TicksEntry wraps java.util.Map$Entry {
+	refers ProcessingUnitDefinition[1] key
+	contains IDiscreteValueDeviation[1] value
+}
+
+enum ModeLabelAccessEnum {
+	_undefined_ // Display: "<access>"
+	read
+	^set
+	increment
+	decrement
+}
+
+/*
+ * Representation of a mode label access of a run entity.
+ */
+class ModeLabelAccess extends ActivityGraphItem
+{
+	refers ModeLabel[1] data
+	ModeLabelAccessEnum access
+	/*
+	 * Just used in case that this access writes a value to a Mode-Label.
+	 * It can be used to define which mode value is written to the label. 
+	 */
+	String value
+	/*
+	 * Just used in case of increment or decrement.
+	 * It can be used to define a step other than 1. 
+	 */
+	PositiveInt step = "1"
+	
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+/*
+ * Representation of a label access of a run entity.
+ */
+class LabelAccess extends ComputationItem, ITaggable, IDependsOn
+{
+	refers Label[1] data
+	LabelAccessEnum access
+
+	/*
+	 * Optional parameter for statistic values
+	 */
+	contains LabelAccessStatistic statistic
+
+	/*
+	 * Optional parameter for transmission policy of larger data
+	 */
+	contains TransmissionPolicy transmissionPolicy
+
+	/*
+	 * Defines the data stability needs of the label access
+	 */
+	LabelAccessDataStability dataStability
+	LabelAccessImplementation implementation	 
+}
+
+abstract class ChannelAccess extends ActivityGraphItem
+{
+	refers Channel[1] data
+	int elements = "0"
+	contains TransmissionPolicy transmissionPolicy
+}
+
+class ChannelSend extends ChannelAccess
+{
+}
+
+class ChannelReceive extends ChannelAccess
+{
+	ReceiveOperation receiveOperation
+	boolean dataMustBeNew = "false"
+	int elementIndex = "0"
+	int lowerBound = "0"
+//	int elementsHold	-> use custom property
+}
+
+enum ReceiveOperation
+{
+	_undefined_ // Display: "<receive operation>"
+	FIFO_Read
+	FIFO_Take
+	LIFO_Read
+	LIFO_Take
+}
+
+/*
+ * Defines the data stability needs of a label access.
+ * Inherited means that the setting of the Label is used
+ */
+enum LabelAccessDataStability
+{
+	_undefined_ // Display: "<data stability>"
+	inherited
+	noProtection
+	automaticProtection
+	customProtection
+	handledByModelElements
+}
+
+enum LabelAccessEnum
+{
+	_undefined_ // Display: "<access>"
+	read
+	write
+}
+
+enum LabelAccessImplementation
+{
+	_undefined_ // Display: "<implementation>"
+	explicit // also known as "direct"
+	implicit // also known as "optimized"
+	timed
+}
+
+/*
+ * Describes an semaphore access
+ */
+class SemaphoreAccess extends ActivityGraphItem
+{
+	refers Semaphore[1] semaphore
+	SemaphoreAccessEnum access
+	WaitingBehaviour waitingBehaviour
+}
+
+/*
+ * request: requests access to semaphore
+ * release: release accessed semaphore
+ * exclusive: gets access to requested semaphore only when there is no other user accessing it
+ */
+enum SemaphoreAccessEnum
+{
+	_undefined_ // Display: "<access>"
+	request
+	exclusive
+	release
+}
+
+/*
+ * An abstract description for sender-receiver-communication (it can be read or write)
+ */
+abstract class SenderReceiverCommunication extends ActivityGraphItem
+{
+	boolean buffered = "false"
+	refers Label[1] label
+	refers ComponentPort port
+}
+
+/*
+ * The read operation of the receiver of the sender-receiver-communication
+ */
+class SenderReceiverRead extends SenderReceiverCommunication {}
+
+/*
+ * The write operation of the sender of the sender-receiver-communication
+ * It contains the runnables that have the corresponding SenderReceiverRead  
+ */
+class SenderReceiverWrite extends SenderReceiverCommunication
+{
+	refers Runnable[] notifiedRunnables
+}
+
+/*
+ * An abstract description for client/server communication
+ * It refers to a required runnable that describes the called server operation
+ */
+abstract class ServerCall extends ActivityGraphItem
+{
+	refers Runnable[1] serverRunnable
+	refers ComponentPort port
+}
+
+/*
+ * A synchronous server call
+ */
+class SynchronousServerCall extends ServerCall
+{
+	WaitingBehaviour waitingBehaviour
+}
+
+/*
+ * A asynchronous server call
+ * It refers to a optional runnable that exploits the results produced by the server
+ */
+class AsynchronousServerCall extends ServerCall
+{
+	refers Runnable resultRunnable
+}
+
+/*
+ * Get the result of a previous asynchronous server call
+ */
+class GetResultServerCall extends ServerCall
+{
+	BlockingType blockingType
+}
+
+/*
+ * Blocking type
+ */
+enum BlockingType
+{
+	_undefined_ // Display: "<blocking>"
+	active_wait
+	passive_wait
+	non_blocking
+}
+
+/*
+ * Describes a group of deviation runnable items
+ */
+class Group extends ActivityGraphItem, INamed, IActivityGraphItemContainer
+{
+	boolean ordered = "true"
+	/*
+	 * @since 1.2
+	 */
+	boolean interruptible = "true"
+}
+
+class CallArgument extends ReferableObject, IDependsOn
+{
+	@GenModel(propertyCategory="Read only")
+	container readonly RunnableCall containingCall opposite arguments
+	
+	op String getName() {
+		if (super.name.nullOrEmpty) "access-1" else super.name
+	}
+	
+	op String[] getNamePrefixSegments() {
+		val segments = newBasicEList
+		val runnableOrProcess = containingCall?.containingActivityGraph?.eContainer as IReferable
+		if (runnableOrProcess !== null) {
+			// segments.add( runnableOrProcess.eClass.name.toUpperCase )
+			segments.addAll( runnableOrProcess.qualifiedNameSegments )
+		}
+		segments.add( "calls" )
+		segments.addAll( containingCall?.runnable?.qualifiedNameSegments ?: #[""] )
+		segments.add( "param" )
+		segments.add( (parameter?.name) ?: "" )
+		return segments
+	}
+	
+	@GenModel(propertyCategory="Basic")
+	refers RunnableParameter parameter
+}
+
+/*
+ * Representation of a runnable call of a run entity.
+ */
+class RunnableCall extends ActivityGraphItem, ITaggable
+{
+	refers Runnable[1] runnable
+	contains CallArgument[] arguments opposite containingCall
+	contains LocalModeLabelAssignment[] context
+
+	contains Counter counter
+
+	contains RunEntityCallStatistic statistic
+}
+
+/*
+ * Preemption type for scheduling
+ */
+enum Preemption
+{
+	_undefined_ // Display: "<preemption>"
+	preemptive
+	cooperative // aka limited-preemptive
+	non_preemptive
+}
+
+/*
+ * Concurrency type of an entity
+ */
+enum ConcurrencyType
+{
+	_undefined_ // Display: "<concurrency>"
+	/*
+	 * Safe for access inside of the same core
+	 */
+	SingleCoreSafe
+	/*
+	 * Safe for access from another core
+	 */
+	MultiCoreSafe
+	SingleCorePrioSafe
+}
+
+/*
+ * Explicitly trigger a custom event from a runnable.
+ */
+class CustomEventTrigger extends ActivityGraphItem
+{
+	refers CustomEvent[1] event
+}
+
+/*
+ * Central access point for different data type definitions
+ */
+interface DataType
+{
+}
+
+/*
+ * Couple of compound data types
+ */
+abstract class CompoundType extends BaseObject, DataType
+{
+}
+
+/*
+ * Representing a struct definition, containing different entries
+ */
+class Struct extends CompoundType, ITaggable
+{
+	contains StructEntry[] entries
+}
+
+/*
+ * Representation of one struct entry
+ */
+class StructEntry extends BaseObject, INamed, ITaggable
+{
+	contains DataType dataType
+}
+
+/*
+ * Representation of an array data type
+ */
+class Array extends CompoundType
+{
+	int numberElements = "0"
+	contains DataType dataType
+}
+
+/*
+ * Representing a pointer
+ */
+class Pointer extends CompoundType
+{
+	contains DataType dataType
+}
+
+class TypeRef extends BaseObject, DataType
+{
+	refers TypeDefinition typeDef
+}
+
+
+class Alias extends BaseObject
+{
+	/*
+	 * Name of the target environment
+	 */
+	String target
+	/*
+	 * Corresponding name in the target environment
+	 */
+	String alias
+}
+
+abstract class TypeDefinition extends ReferableBaseObject, INamespaceMember
+{
+	/*
+	 * Size of the defined data type
+	 */
+	contains DataSize size
+}
+
+@GenModel(labelFeature="qualifiedName")
+class DataTypeDefinition extends TypeDefinition
+{
+	contains DataType dataType
+}
+
+/*
+ * Basic data type definition, including naming (alias) in target environments
+ */
+@GenModel(labelFeature="qualifiedName")
+class BaseTypeDefinition extends TypeDefinition
+{
+	/*
+	 * Naming in different target environments
+	 */
+	contains Alias[] aliases
+}
+
+/*
+ * General abstraction for activation source.
+ * Used for first definition of an activation rate, which is later refined by stimulus.
+ */
+abstract class Activation extends ReferableBaseObject, ITaggable
+{
+}
+
+/*
+ * Min and Max execution frequency within a task or timeslice
+ */
+class PeriodicActivation extends Activation
+{
+	contains Time min
+	contains Time max
+	contains Time[1] recurrence
+	contains Time offset
+}
+
+/*
+ * Periodic activation based on other events, like rotation speed
+ */
+class VariableRateActivation extends Activation, IDescription
+{
+	contains Time[1] step
+	contains IContinuousValueDeviation[1] occurrencesPerStep
+}
+
+class SporadicActivation extends Activation, IDescription
+{
+	contains ITimeDeviation[1] occurrence
+}
+
+/*
+ * A single activation between time min and max
+ */
+class SingleActivation extends Activation
+{
+	contains Time[1] min
+	contains Time[1] max
+}
+
+/*
+ * Activation which is triggered by an event.
+ */
+class EventActivation extends Activation
+{
+	refers TriggerEvent[+] triggeringEvents
+	contains Counter counter
+}
+
+class CustomActivation extends Activation, IDescription
+{
+}
+
+/*
+ * Contains information about access statistic values
+ */
+class LabelAccessStatistic extends BaseObject
+{
+	contains NumericStatistic value
+	contains NumericStatistic cacheMisses
+}
+
+class RunEntityCallStatistic extends BaseObject
+{
+	contains NumericStatistic statistic
+}
+
+enum ASILType
+{
+	_undefined_ // Display: "<ASIL Level>"
+	D
+	C
+	B
+	A
+	QM
+}
+
+@GenModel(labelFeature="qualifiedName")
+class LocalModeLabel extends ReferableBaseObject {
+
+	@GenModel(propertyCategory="Read only")
+	container readonly IExecutable containingExecutable opposite localLabels
+
+	refers Mode[1] mode
+	String defaultValue
+
+	op String[] getNamePrefixSegments() {
+		val exe = containingExecutable
+		if (exe instanceof INamed) exe.qualifiedNameSegments else newBasicEList
+	}
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+
+	op boolean isEnum() {mode instanceof EnumMode}
+	op boolean isNumeric() {mode instanceof NumericMode}
+}
+
+abstract class LocalModeValue {
+	refers LocalModeLabel[1] label
+	contains ILocalModeValueSource[1] valueSource
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}
+
+class LocalModeLabelAssignment extends LocalModeValue, ActivityGraphItem {
+}
+
+class LocalModeCondition extends LocalModeValue, Condition, IAnnotatable {
+	RelationalOperator relation
+}
+
+interface ILocalModeValueSource {
+	op boolean isEnum() {false}
+	op boolean isNumeric() {false}
+	op Mode getMode() {null}
+}
+
+class ModeLiteralConst extends ILocalModeValueSource {
+	refers ModeLiteral[1] value
+
+	op boolean isEnum() {true}
+	op Mode getMode() {value?.containingMode}
+}
+
+class IntegerConst extends ILocalModeValueSource {
+	int[1] value = "0"
+
+	op boolean isNumeric() {true}
+}
+
+class ModeLabelRef extends ILocalModeValueSource {
+	refers ModeLabel[1] value
+
+	op boolean isEnum() {value.isEnum}
+	op boolean isNumeric() {value.isNumeric}
+	op Mode getMode() {value?.mode}
+}
+
+class LocalModeLabelRef extends ILocalModeValueSource {
+	refers LocalModeLabel[1] value
+
+	op boolean isEnum() {value.isEnum}
+	op boolean isNumeric() {value.isNumeric}
+	op Mode getMode() {value?.mode}
+}
+
+class ChannelFillRef extends ILocalModeValueSource {
+	refers Channel[1] value
+
+	op boolean isNumeric() {true}
+}
+
+class ArithmeticExpression extends ILocalModeValueSource {
+	contains ILocalModeValueSource operand1
+	contains ILocalModeValueSource operand2
+	ArithmeticOperator operator
+
+	op boolean isNumeric() {true}
+}
+
+enum ArithmeticOperator
+{
+	_undefined_ // Display: "<calculation>"
+	ADD
+	SUBTRACT
+	MULTIPLY
+	MODULO
+}
+
+class ModeLabelAssignment extends ActivityGraphItem {
+	refers ModeLabel[1] globalLabel
+	refers LocalModeLabel[1] localLabel
+
+	op boolean validateInvariants(EDiagnosticChain diagnostics, EMap<Object,Object> context) {
+		AmaltheaValidations.validateInvariants(this, diagnostics)
+	}
+}

@@ -142,6 +142,15 @@ pub fn scalar_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
 ]}
 
 
+pub fn all_rules() ->  Vec<Rewrite<TensorLang, TensorAnalysis>> {
+    let mut all_rules = vec![];
+    all_rules.extend(scalar_rules());
+    all_rules.extend(split_rules());
+
+    return all_rules;
+}
+
+
 test_fn! {
     comm_add, 
     scalar_rules(), 

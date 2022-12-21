@@ -31,6 +31,7 @@ define_language! {
         "*"         = Mul([Id; 2]),
         "//"        = CeilDiv([Id; 2]),
         "%"         = CeilRem([Id; 2]),
+        "pow"       = Pow([Id; 2]),
 
         //FIXME these should get promoted to linear to some kind of external function calls
         "matmul"    = Matmul([Id; 2]),    // input1, input2

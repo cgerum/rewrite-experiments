@@ -28,7 +28,6 @@ impl Default for DataKind {
 }
 
 
-
 /// Metadata struct for TensorAnalysis
 #[derive(Debug, Clone)]
 pub struct TensorData {
@@ -277,8 +276,6 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 data.kind = DataKind::List;
                 data
             }
-
-            
 
             other => {
                 println!("{:?}", other);

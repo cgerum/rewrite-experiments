@@ -32,9 +32,9 @@ fn main() {
 
     let start: RecExpr<TensorLang> = args.arg_EXPRESSION.parse().unwrap();
 
-    let rules = vec![];
+    let rules = all_rules();
 
-    let runner: Runner<TensorLang, TensorAnalysis> = Runner::default().with_expr(&start).run(rules);
+    let runner: Runner<TensorLang, TensorAnalysis> = Runner::default().with_expr(&start).run(&rules);
     
     let extractor = Extractor::new(&runner.egraph, AstSize);
 

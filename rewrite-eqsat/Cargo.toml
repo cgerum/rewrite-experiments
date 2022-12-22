@@ -1,5 +1,5 @@
 [package]
-name = "rewrite_egg"
+name = "rewrite_eqsat"
 version = "0.1.0"
 edition = "2021"
 

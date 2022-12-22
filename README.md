@@ -5,11 +5,14 @@ This repository contains some early work on Hardware Performance Aware Term Rewr
 
 ## Performance ~~Meta~~Modeling
 
+In `metamodel` you find some dabbling into the performance modeling using python bindings for the [amalthea/app4mc](https://www.eclipse.org/app4mc/help/latest/index.html#section1) performance model. Especially the concept of *Hardware Features*
+and *Computation Needs* seems pretty interesting for hardware accelerator modeling ([further reading](https://www.eclipse.org/app4mc/help/latest/index.html#section2.2.2.2)). 
+
 ## Equality Saturation based term rewriting
 
-The term rewriting prototype based on [egg](https://egraphs-good.github.io/). 
+The term rewriting prototype located in `rewrite-eqsat` is  based on [egg](https://egraphs-good.github.io/). 
 
-Getting Started: 
+### Getting Started
 
 ```bash
 # First install rust using rustup
@@ -48,7 +51,6 @@ Best Cost: 1
 ```
 
 But be aware that the tracking of rewrites takes a lot of resources. It should not be needed besides debugging and maybe some verification purposes. 
-
 
 
 

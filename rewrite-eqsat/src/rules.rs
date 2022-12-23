@@ -151,56 +151,61 @@ pub fn all_rules() ->  Vec<Rewrite<TensorLang, TensorAnalysis>> {
 }
 
 
-test_fn! {
-    comm_add, 
-    scalar_rules(), 
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(+ a 1)" => "(+ 1 a)"
-}
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    test_fn! {
+        comm_add, 
+        scalar_rules(), 
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(+ a 1)" => "(+ 1 a)"
+    }
 
 
-test_fn!{
-    comm_arith, 
-    scalar_rules(),
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(* a (+ b c))" => "(+ (* a b) (* a c))", "(* (+ b c) a)" 
-}
+    test_fn!{
+        comm_arith, 
+        scalar_rules(),
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(* a (+ b c))" => "(+ (* a b) (* a c))", "(* (+ b c) a)" 
+    }
 
 
-test_fn! {
-    add_zero, 
-    scalar_rules(), 
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(+ a 0)" => "(+ 0 a)", "a"
-}
+    test_fn! {
+        add_zero, 
+        scalar_rules(), 
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(+ a 0)" => "(+ 0 a)", "a"
+    }
 
 
-test_fn! {
-    cancel_div, 
-    scalar_rules(), 
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(// 5 5)" => "1"
-}
+    test_fn! {
+        cancel_div, 
+        scalar_rules(), 
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(// 5 5)" => "1"
+    }
 
 
-test_fn! {
-    complex_arith, 
-    scalar_rules(), 
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(+ (// 5 (+ 1 (* 0 5))) (* (+ c a) 0))" => "5"
-}
+    test_fn! {
+        complex_arith, 
+        scalar_rules(), 
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(+ (// 5 (+ 1 (* 0 5))) (* (+ c a) 0))" => "5"
+    }
 
 
-test_fn!{
-    split_1,
-    split_rules(),
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(tensor test (shape 1 2 3))" => "(stack (split (tensor test (shape 1 2 3)) 1 1) 1)"
-}
+    test_fn!{
+        split_1,
+        split_rules(),
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(tensor test (shape 1 2 3))" => "(stack (split (tensor test (shape 1 2 3)) 1 1) 1)"
+    }
 
-test_fn!{
-    split_2,
-    split_rules(),
-    runner = Runner::<TensorLang, TensorAnalysis>::default(),
-    "(tensor test (shape 1 4 3))" => "(stack (split (tensor test (shape 1 4 3)) 2 1) 1)"
+    test_fn!{
+        split_2,
+        split_rules(),
+        runner = Runner::<TensorLang, TensorAnalysis>::default(),
+        "(tensor test (shape 1 4 3))" => "(stack (split (tensor test (shape 1 4 3)) 2 1) 1)"
+    }
 }

@@ -300,26 +300,32 @@ impl Analysis<TensorLang> for TensorAnalysis {
 
 
 
-#[test]
-fn test_symbol() {
-    let expr : RecExpr<TensorLang> = "n".parse().unwrap();
+#[cfg(test)]
+mod tests {
 
-    let mut graph : EGraph::<TensorLang, TensorAnalysis> = Default::default();
+    use super::*;
 
-    let id = graph.add_expr(&expr);
-    graph.rebuild();
+    #[test]
+    fn test_symbol() {
+        let expr : RecExpr<TensorLang> = "n".parse().unwrap();
 
-}
+        let mut graph : EGraph::<TensorLang, TensorAnalysis> = Default::default();
 
-#[test]
-fn test_constant(){
-    let expr: RecExpr<TensorLang> = "1".parse().unwrap();
-    let mut graph: EGraph::<TensorLang, TensorAnalysis> = Default::default();
+        let id = graph.add_expr(&expr);
+        graph.rebuild();
 
-    let id = graph.add_expr(&expr);
-    graph.rebuild();
+    }
 
-    let data = &graph[id].data;
-    assert!(data.kind == DataKind::Scalar);
-    assert!(data.val == 1);
+    #[test]
+    fn test_constant(){
+        let expr: RecExpr<TensorLang> = "1".parse().unwrap();
+        let mut graph: EGraph::<TensorLang, TensorAnalysis> = Default::default();
+
+        let id = graph.add_expr(&expr);
+        graph.rebuild();
+
+        let data = &graph[id].data;
+        assert!(data.kind == DataKind::Scalar);
+        assert!(data.val == 1);
+    }
 }

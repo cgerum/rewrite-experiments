@@ -40,7 +40,7 @@ The rewrite steps leading to the best expression can be show using the flag `--e
 cargo run --release -- --explain "(+ a 0)"
 ```
 
-Should produce show the rules producing this minimization. 
+Should show the rules producing this minimization. 
 
 ```
 (+ a 0)
@@ -52,5 +52,10 @@ Best Cost: 1
 
 But be aware that the tracking of rewrites takes a lot of resources. It should not be needed besides debugging and maybe some verification purposes. 
 
+## Example Runs with NN Operators
 
+```
+cargo run -- "(stack (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2))) (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2)))) 1)"
 
+cargo run -- "(stack (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2))) (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2)))) 1)"
+```

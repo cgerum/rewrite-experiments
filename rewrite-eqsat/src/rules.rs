@@ -110,10 +110,10 @@ impl Applier<TensorLang, TensorAnalysis> for ExpTransposeApplier {
 
 #[rustfmt::skip]
 pub fn split_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
-    rewrite!("exp-split-stack"; "?a" =>  { SplitStackApplier {orig: var("?a") } } ),
+    //rewrite!("exp-split-stack"; "?a" =>  { SplitStackApplier {orig: var("?a") } } ),
     rewrite!("stack-matmul"; "(stack (list (matmul ?a ?b) (matmul ?c ?d)) ?dim)" => "(matmul (stack (list ?a ?c) ?dim) (stack (list ?b ?d) ?dim))"),
-    rewrite!("stack-matmul"; "(matmul (stack (list ?a ?c) ?dim) (stack (list ?b ?d) ?dim))" => "(stack (list (matmul ?a ?b) (matmul ?c ?d)) ?dim)"),
-    rewrite!("exp-transpose"; "?a" => { ExpTransposeApplier {orig: var("?a")} }),
+    rewrite!("stack-matmul2"; "(matmul (stack (list ?a ?c) ?dim) (stack (list ?b ?d) ?dim))" => "(stack (list (matmul ?a ?b) (matmul ?c ?d)) ?dim)"),
+    //rewrite!("exp-transpose"; "?a" => { ExpTransposeApplier {orig: var("?a")} }),
 ]}
 
 

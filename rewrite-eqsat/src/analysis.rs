@@ -81,9 +81,9 @@ impl Analysis<TensorLang> for TensorAnalysis {
 
                 for elem in values.iter() {
                     let data = x(elem);
-                    assert!(data.kind == DataKind::Scalar);
-                    assert!(data.constant == true);
-                    lst.push(data.val);
+                    if data.kind == DataKind::Scalar {
+                        lst.push(data.val);
+                    }
                 }
 
 

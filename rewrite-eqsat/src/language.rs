@@ -5,6 +5,37 @@
 
 use egg::*;
 
+// Represents an external function, allows to define functions in egraph
+pub struct ExternalFunction {   
+    name: Id,
+    namespace: Id,
+    args: Vec<Id>,
+}
+
+impl LanguageChildren for ExternalFunction {
+    fn len(&self) -> usize {
+        self.args.len() + 2
+    }
+
+    fn can_be_length(n: usize) -> bool{
+        true
+    }
+
+    fn from_vec(v: Vec<Id>) -> Self{
+        ExternalFunction{name: v[0], namespace: v[1], args: v.clone()}
+    }
+
+    fn as_slice(&self) -> &[Id] {
+        self.args.as_slice()
+    }
+    fn as_mut_slice(&mut self) -> &mut [Id] {
+        self.args.as_mut_slice()
+    }
+    fn is_empty(&self) -> bool { 
+        false
+     }
+}
+
 define_language! {
     pub enum TensorLang {
         "list"      = List(Box<[Id]>),    // Represents a variable length list
@@ -33,7 +64,7 @@ define_language! {
         "%"         = CeilRem([Id; 2]),
         "pow"       = Pow([Id; 2]),
 
-        //FIXME these should get promoted to linear to some kind of external function calls
+        //FIXME these should get promoted to linear or to some kind of external function calls
         "matmul"    = Matmul([Id; 2]),    // input1, input2
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
         "elementwise" = Elementwise([Id; 2]), // Function, input
@@ -53,6 +84,9 @@ mod tests {
         let shape_expr : RecExpr<TensorLang> = "(shape 1 2 3 4 5)".parse().unwrap();
         let input_expr : RecExpr<TensorLang> = "(tensor test (shape 1 2))".parse().unwrap();
         let weight_expr : RecExpr<TensorLang> = "(const test (shape 1 2))".parse().unwrap();
+
+        let i = 1;
+        let i2: u32 = i;
     }
 
 

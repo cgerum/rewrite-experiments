@@ -1,5 +1,4 @@
 use egg::*;
-use ndarray::Data;
 use itertools::Itertools;
 
 use crate::analysis::*;

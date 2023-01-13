@@ -134,12 +134,16 @@ pub fn scalar_rules() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
     rewrite!("one-mul";  "(* ?a 1)" => "?a"),
     rewrite!("one-div"; "(// ?a 1)" => "?a"),
     
-    rewrite!("add-zero"; "?a" => "(+ ?a 0)"),
-    rewrite!("mul-one";  "?a" => "(* ?a 1)"),
-
     rewrite!("cancel-sub"; "(- ?a ?a)" => "0"),
     rewrite!("cancel-div"; "(// ?a ?a)" => "1" if is_not_zero("?a"))
 ]}
+
+#[rustfmt::skip]
+pub fn scalar_rules_exploratory() -> Vec<Rewrite<TensorLang, TensorAnalysis>> { vec![
+    rewrite!("add-zero"; "?a" => "(+ ?a 0)"),
+    rewrite!("mul-one";  "?a" => "(* ?a 1)"),
+]}
+
 
 
 pub fn all_rules() ->  Vec<Rewrite<TensorLang, TensorAnalysis>> {

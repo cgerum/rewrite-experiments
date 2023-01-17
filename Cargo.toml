@@ -1,0 +1,13 @@
+[workspace]
+members = [
+    "rewrite-eqsat",
+    "rewrite-py"
+]
+
+
+[profile.bench]
+debug = true
+
+
+
+

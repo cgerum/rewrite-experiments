@@ -5,37 +5,6 @@
 
 use egg::*;
 
-// Represents an external function, allows to define functions in egraph
-pub struct ExternalFunction {   
-    name: Id,
-    namespace: Id,
-    args: Vec<Id>,
-}
-
-impl LanguageChildren for ExternalFunction {
-    fn len(&self) -> usize {
-        self.args.len() + 2
-    }
-
-    fn can_be_length(n: usize) -> bool{
-        true
-    }
-
-    fn from_vec(v: Vec<Id>) -> Self{
-        ExternalFunction{name: v[0], namespace: v[1], args: v.clone()}
-    }
-
-    fn as_slice(&self) -> &[Id] {
-        self.args.as_slice()
-    }
-    fn as_mut_slice(&mut self) -> &mut [Id] {
-        self.args.as_mut_slice()
-    }
-    fn is_empty(&self) -> bool { 
-        false
-     }
-}
-
 define_language! {
     pub enum TensorLang {
         "list"      = List(Box<[Id]>),    // Represents a variable length list
@@ -53,7 +22,7 @@ define_language! {
         // describe memory transforms that change the "view" of the memory without actually copying data 
         
         // TODO (cgerum); generalized compute on tensors
-        // Do we really w
+        // Do we really want to have such a generic compute
         // "compute"    = Compute([ID; 3])
 
         //Scalar Expression
@@ -68,8 +37,10 @@ define_language! {
         "matmul"    = Matmul([Id; 2]),    // input1, input2
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
         "elementwise" = Elementwise([Id; 2]), // Function, input
+        "extern" = Extern(Box<[Id]>), // An external function call 
         Num(i32),
         Symbol(Symbol),
+        
     }
 }
 

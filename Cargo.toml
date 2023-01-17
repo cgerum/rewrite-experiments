@@ -1,7 +1,6 @@
 [workspace]
 members = [
-    "rewrite-eqsat",
-    "rewrite-py"
+    "rewrite-eqsat"
 ]
 
 

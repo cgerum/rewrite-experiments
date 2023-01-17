@@ -55,7 +55,29 @@ But be aware that the tracking of rewrites takes a lot of resources. It should n
 ## Example Runs with NN Operators
 
 ```
-cargo run -- "(stack (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2))) (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2)))) 1)"
+cargo run -- "(stack (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2)) matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2))) 1)"
 
-cargo run -- "(stack (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2))) (list matmult (tensor i1 (shape 1 2 4)) (tensor w1 (shape 1 4 2)))) 1)"
+cargo run -- "(matmult (stack (list (tensor i1 (shape 1 2 4)) (tensor i1 (shape 1 2 4))) 1)  (stack (list (tensor i1 (shape 1 4 2)) (tensor i1 (shape 1 4 2))) 1))))"
 ```
+
+## TODOs
+
+An extended and non exhaustive List of possible TODOs:
+
+- [ ] Operator Support
+  - [ ] matmult
+  - [ ] add
+  - [ ] mult
+  - [ ] sub
+  - [ ] exp
+  - [ ] relu
+  - [ ] sigmoid 
+- [ ] Extend Ruleset
+  - [ ] Test Performance on Operators
+  - [ ] ...
+- [ ] Datatypes 
+  - [ ] Arbitrary Precision Integer
+  - [ ] Float (only fp16 and fp32 or arbitrary precision?)
+- [ ] Compiler Integration
+- [ ] NAS Integration
+- [ ] Python Bindings

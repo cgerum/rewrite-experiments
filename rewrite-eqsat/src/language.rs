@@ -22,7 +22,7 @@ define_language! {
         // describe memory transforms that change the "view" of the memory without actually copying data 
         
         // TODO (cgerum); generalized compute on tensors
-        // Do we really w
+        // Do we really want to have such a generic compute
         // "compute"    = Compute([ID; 3])
 
         //Scalar Expression
@@ -33,12 +33,14 @@ define_language! {
         "%"         = CeilRem([Id; 2]),
         "pow"       = Pow([Id; 2]),
 
-        //FIXME these should get promoted to linear to some kind of external function calls
+        //FIXME these should get promoted to linear or to some kind of external function calls
         "matmul"    = Matmul([Id; 2]),    // input1, input2
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
         "elementwise" = Elementwise([Id; 2]), // Function, input
+        "extern" = Extern(Box<[Id]>), // An external function call 
         Num(i32),
         Symbol(Symbol),
+        
     }
 }
 
@@ -53,6 +55,9 @@ mod tests {
         let shape_expr : RecExpr<TensorLang> = "(shape 1 2 3 4 5)".parse().unwrap();
         let input_expr : RecExpr<TensorLang> = "(tensor test (shape 1 2))".parse().unwrap();
         let weight_expr : RecExpr<TensorLang> = "(const test (shape 1 2))".parse().unwrap();
+
+        let i = 1;
+        let i2: u32 = i;
     }
 
 

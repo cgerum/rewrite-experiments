@@ -16,5 +16,3 @@ rayon = "1.6.1"
 serde = { version = "1.0.151", features = ["serde_derive"] }
 
 
-[profile.bench]
-debug = true

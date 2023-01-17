@@ -71,7 +71,7 @@ pub struct TensorAnalysis{
 impl Analysis<TensorLang> for TensorAnalysis {
     type Data = TensorData;
 
-    // Constructs metadata for a new enode, using TASO side functions for tensors.
+    // Constructs metadata for a new enode
     fn make(egraph: &EGraph<TensorLang, Self>, enode: &TensorLang) -> Self::Data {
         let x = |i: &Id| &egraph[*i].data;
 
@@ -85,7 +85,6 @@ impl Analysis<TensorLang> for TensorAnalysis {
                         lst.push(data.val);
                     }
                 }
-
 
                 Self::Data{
                     kind: DataKind::Shape,

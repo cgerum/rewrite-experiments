@@ -1,0 +1,1 @@
+ export TVM_HOME=$PWD/thirdparty/tvm

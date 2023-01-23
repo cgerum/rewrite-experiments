@@ -11,3 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = { version = "0.17.3", features = ["extension-module"] }
 rewrite_eqsat =  { path = "../rewrite-eqsat" }
+
+[features]
+tvm = ["rewrite_eqsat/tvm"]
+rayon = ["rewrite_eqsat/rayon"]

@@ -26,7 +26,7 @@ jobs:
           thirdparty/tvm/build
         key: ${{ runner.os }}-tvm
     - name: Build tvm
-      run ./build_tvm.sh 
+      run: ./build_tvm.sh 
     - name: Save TVM build
       id: cache-primes-save
       uses: actions/cache/save@v3

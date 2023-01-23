@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: recursive
     - name: Install Dependencies
       run: sudo apt install -y coinor-libcbc-dev build-essential
     - name: Restore cached tvm build

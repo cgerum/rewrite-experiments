@@ -1,8 +1,9 @@
-#!/bin/bash
+#!/bin/bash -e
 
+source env
 
-mkdir -p external/tvm/build
-pushd external/tvm/build
+mkdir -p $TVM_HOME/build
+pushd $TVM_HOME/build
 cmake -G Ninja .. 
 ninja
 popd

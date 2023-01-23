@@ -33,7 +33,7 @@ jobs:
       with:
         path: |
           thirdparty/tvm/build
-        key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
+        key: ${{ steps.cache-tvm-restore.outputs.cache-primary-key }}
     - name: Build
       run: cd rewrite-eqsat; cargo build --verbose
     - name: Run tests

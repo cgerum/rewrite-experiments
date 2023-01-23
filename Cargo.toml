@@ -1,10 +1,22 @@
 [workspace]
 members = [
-    "rewrite-eqsat"
+    "rewrite-eqsat",
+    "rewrite-py",
+]
+exclude = [
+    "thirdparty/tvm/rust"
 ]
 
+# Does not seem to work, use `source env` in this directory instead
+# [env]
+#TVM_HOME = { value = "thirdparty/tvm", relative = true }
+
+[patch.crates-io]
+## Hotfix for tvm-build
+heim = {git="https://github.com/heim-rs/heim.git"}
 
 [profile.bench]
+
 debug = true
 
 

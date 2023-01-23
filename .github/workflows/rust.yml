@@ -17,7 +17,23 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install Dependencies
-      run: sudo apt install -y coinor-libcbc-dev 
+      run: sudo apt install -y coinor-libcbc-dev build-essential
+    - name: Restore cached tvm build
+      id: cache-tvm-restore
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          thirdparty/tvm/build
+        key: ${{ runner.os }}-tvm
+    - name: Build tvm
+      run ./build_tvm.sh 
+    - name: Save TVM build
+      id: cache-primes-save
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          thirdparty/tvm/build
+        key: ${{ steps.cache-primes-restore.outputs.cache-primary-key }}
     - name: Build
       run: cd rewrite-eqsat; cargo build --verbose
     - name: Run tests

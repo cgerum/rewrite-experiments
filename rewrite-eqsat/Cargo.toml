@@ -7,12 +7,18 @@ edition = "2021"
 
 [dependencies]
 docopt = "1.1.1"
-egg = { version = "0.9.1", features = ["coin_cbc", "reports", "lp"] }
+egg = { version = "0.9.1", features = ["coin_cbc", "lp"] }
 ilog = "0.1.4"
 itertools = "0.10.5"
-ndarray = { version = "0.15.6", features = ["rayon", "serde"] }
+ndarray = { version = "0.15.6"}
 rand = "0.8.5"
-rayon = "1.6.1"
-serde = { version = "1.0.151", features = ["serde_derive"] }
+rayon = {version="1.6.1", optional = true}
+serde = { version = "1.0.151", features = ["serde_derive"], optional = true }
+tvm = { path = "../thirdparty/tvm/rust/tvm", optional = true }
 
 
+[features]
+default = ["serde"]
+serde = ["dep:serde", "ndarray/serde", "egg/reports"]
+rayon = ["dep:rayon", "ndarray/rayon"]
+tvm = ["dep:tvm"]

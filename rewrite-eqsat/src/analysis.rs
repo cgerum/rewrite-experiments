@@ -34,7 +34,7 @@ pub struct TensorData {
     /// The data type of this eclass, can be a name/scalar/tensor
     pub kind: DataKind,
     /// The value of this eclass if it is a Scalar type
-    pub val: i32,
+    pub val: isize,
     /// The name string of this eclass if it is a Name type
     pub name: String,
     /// If the tensor results from all constant computations
@@ -82,7 +82,7 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 for elem in values.iter() {
                     let data = x(elem);
                     if data.kind == DataKind::Scalar {
-                        lst.push(data.val);
+                        lst.push(data.val.try_into().unwrap());
                     }
                 }
 
@@ -101,7 +101,7 @@ impl Analysis<TensorLang> for TensorAnalysis {
                     let data = x(elem);
                     assert!(data.kind == DataKind::Scalar);
                     assert!(data.constant == true);
-                    s.push(data.val);
+                    s.push(data.val.try_into().unwrap());
                 }
 
 
@@ -217,9 +217,16 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 }
             }
 
-            TensorLang::Num(_n) => Self::Data {
+            TensorLang::Int(_n) => Self::Data {
                 kind: DataKind::Scalar,
                 val: *_n,
+                name: String::new(),
+                constant: true,
+                ..Default::default()
+            },
+            TensorLang::UInt(_n) => Self::Data {
+                kind: DataKind::Scalar,
+                val: *_n as isize, //FIXME: make analysis type sensitive
                 name: String::new(),
                 constant: true,
                 ..Default::default()
@@ -276,10 +283,17 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 data
             }
 
-            other => {
+            TensorLang::Extern(args) => {
+                Self::Data::default()
+            }
+
+            TensorLang::Pow([val, exp]) => {
+                Self::Data::default()
+            }
+            /*other => {
                 println!("{:?}", other);
                 todo!()
-            }
+            }*/
         }
     }
 

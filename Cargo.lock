@@ -1732,6 +1732,7 @@ dependencies = [
 name = "rewrite_eqsat"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "docopt",
  "egg",
  "ilog",

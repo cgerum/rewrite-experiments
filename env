@@ -1,3 +1,4 @@
 export TVM_HOME=$PWD/thirdparty/tvm
 export LD_LIBRARY_PATH=$TVM_HOME/build
+
  

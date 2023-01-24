@@ -15,12 +15,13 @@ Equality Saturation based prototype for graph rewriting
 
 Usage:
     eqsat (-h | --help)
-    eqsat [-s | --stats] [--explain] <expression>
-    eqsat [-s | --stats] [--explain] -f <file>
+    eqsat [-s | --stats] [--explain] [--svg] <expression>
+    eqsat [-s | --stats] [--explain] [--svg] -f <file>
 
 Options:
   -h --help     Show this screen.
   --explain     Show list of transformations for this exception.
+  --svg         Create svg files for equality saturation graphs.
   -s --stats    Print statistics considering the size of the used egraph, 
                 and the runtime of equality saturation
   -f --file     relay file to run optimization over
@@ -30,6 +31,7 @@ Options:
 struct Args {
     flag_explain: bool,
     flag_stats: bool, 
+    flag_svg: bool,
     arg_expression: String,
     arg_file: PathBuf,
 }
@@ -60,6 +62,11 @@ fn main() {
         panic!("Either file or expression must be given");
     }
 
+    if args.flag_svg {
+        runner.egraph.dot().to_svg("egraph_start.svg").unwrap()
+    }
+
+
     let rules = all_rules();
     runner = runner.run(&rules);
     
@@ -70,6 +77,10 @@ fn main() {
 
     if args.flag_stats {
         runner.print_report();
+    }
+
+    if args.flag_svg {
+        runner.egraph.dot().to_svg("egraph_end.svg").unwrap();
     }
 
     if args.flag_explain {

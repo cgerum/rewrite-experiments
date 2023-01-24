@@ -52,8 +52,10 @@ fn main() {
     }else if args.arg_file.exists() {
         println!("Opening file {}", args.arg_file.to_string_lossy());
         start = from_relay(args.arg_file).unwrap();
+        runner = runner.with_expr(&start);
+        //println!("{}", start.pretty(30));
 
-        todo!("Finish relay parser");
+        //todo!("Finish relay parser");
     }else{
         panic!("Either file or expression must be given");
     }

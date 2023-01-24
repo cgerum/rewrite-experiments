@@ -38,7 +38,8 @@ define_language! {
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
         "elementwise" = Elementwise([Id; 2]), // Function, input
         "extern" = Extern(Box<[Id]>), // An external function call 
-        Num(i32),
+        Int(isize),
+        UInt(usize),
         Symbol(Symbol),
         
     }

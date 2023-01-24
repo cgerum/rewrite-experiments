@@ -19,7 +19,7 @@ tvm = { path = "../thirdparty/tvm/rust/tvm", optional = true }
 
 
 [features]
-default = ["serde"]
+default = ["serde", "tvm"]
 serde = ["dep:serde", "ndarray/serde", "egg/reports"]
 rayon = ["dep:rayon", "ndarray/rayon"]
 tvm = ["dep:tvm"]

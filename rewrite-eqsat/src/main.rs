@@ -8,7 +8,6 @@ use rewrite_eqsat::analysis::TensorAnalysis;
 use rewrite_eqsat::rules::*;
 use rewrite_eqsat::language::TensorLang;
 
-#[cfg(feature = "tvm")]
 use rewrite_eqsat::tvm::from_relay;
 
 const USAGE: &'static str = "
@@ -40,20 +39,27 @@ fn main() {
         .and_then(|d| d.deserialize())
         .unwrap_or_else(|e| e.exit());
     
-    let mut start = "a".parse().unwrap();
-    if args.arg_expression != "" {
-        start = args.arg_expression.parse().unwrap();
-    }
-
-    let rules = all_rules();
-
     let mut runner: Runner<TensorLang, TensorAnalysis> = Runner::default();
-    
     if args.flag_explain{
         runner = runner.with_explanations_enabled();
     }
 
-    runner = runner.with_expr(&start).run(&rules);
+
+    let mut start = "nil".parse().unwrap();
+    if args.arg_expression != "" {
+        start = args.arg_expression.parse().unwrap();
+        runner = runner.with_expr(&start);
+    }else if args.arg_file.exists() {
+        println!("Opening file {}", args.arg_file.to_string_lossy());
+        start = from_relay(args.arg_file).unwrap();
+
+        todo!("Finish relay parser");
+    }else{
+        panic!("Either file or expression must be given");
+    }
+
+    let rules = all_rules();
+    runner = runner.run(&rules);
     
     let extractor = Extractor::new(&runner.egraph, AstSize);
 

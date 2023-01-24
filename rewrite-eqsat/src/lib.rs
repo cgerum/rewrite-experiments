@@ -1,5 +1,9 @@
 pub mod language;
 pub mod rules;
 pub mod analysis;
-#[cfg(feature = "tvm")]
+
+pub use language::TensorLang;
+pub use analysis::TensorAnalysis;
+pub use rules::all_rules;
+
 pub mod tvm;

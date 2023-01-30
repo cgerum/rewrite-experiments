@@ -36,6 +36,7 @@ define_language! {
         //FIXME these should get promoted to linear to some kind of external function calls
         "matmul"    = Matmul([Id; 2]),    // input1, input2
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
+        "concat"    = Concatenate(Box<[Id]>),
         "elementwise" = Elementwise([Id; 2]), // Function, input
         Num(i32),
         Symbol(Symbol),

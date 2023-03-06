@@ -15,8 +15,8 @@ Equality Saturation based prototype for graph rewriting
 
 Usage:
     eqsat (-h | --help)
-    eqsat [-s | --stats] [--explain] [--svg] <expression>
-    eqsat [-s | --stats] [--explain] [--svg] -f <file>
+    eqsat [-s | --stats] [--node-limit <N>] [--explain] [--svg] <expression>
+    eqsat [-s | --stats] [--node-limit <N>] [--explain] [--svg] -f <file>
 
 Options:
   -h --help     Show this screen.
@@ -25,6 +25,7 @@ Options:
   -s --stats    Print statistics considering the size of the used egraph, 
                 and the runtime of equality saturation
   -f --file     relay file to run optimization over
+  --node-limit  maximum number of nodes in the e-graph
 ";
 
 #[derive(Debug, Deserialize)]
@@ -34,6 +35,7 @@ struct Args {
     flag_svg: bool,
     arg_expression: String,
     arg_file: PathBuf,
+    flag_node_limit: usize,
 }
 
 fn main() {
@@ -46,6 +48,9 @@ fn main() {
         runner = runner.with_explanations_enabled();
     }
 
+    if args.flag_node_limit != 0 {
+      runner = runner.with_node_limit(args.flag_node_limit);
+    }
 
     let mut start = "nil".parse().unwrap();
     if args.arg_expression != "" {
@@ -55,9 +60,6 @@ fn main() {
         println!("Opening file {}", args.arg_file.to_string_lossy());
         start = from_relay(args.arg_file).unwrap();
         runner = runner.with_expr(&start);
-        //println!("{}", start.pretty(30));
-
-        //todo!("Finish relay parser");
     }else{
         panic!("Either file or expression must be given");
     }
@@ -85,7 +87,6 @@ fn main() {
 
     if args.flag_explain {
         let mut explanation = runner.explain_equivalence(&start, &best_expr);
-        
         
         println!("The following transformations produce the minimal cost function:");
         println!("");

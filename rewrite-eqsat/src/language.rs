@@ -13,7 +13,7 @@ define_language! {
         "const"     = Const([Id; 2]),      // takes a Symbol and a Shape, format : name, shape
         "transpose" = Transpose([Id; 2]),  // input, list of axis in order after tranposition
         "split"     = Split([Id; 3]),      // Split a tensor into a list of tensors, input, chunksize: scalar (or list of scalars), dim, scalar
-        "stack"     = Stack([Id; 2]),      // Stack a list of tensors a long a dimensions: list, dim, 
+        "stack"     = Stack([Id; 2]),      // Stack a list of tensors along a dimensions: list, dim, 
 
         // TODO (cgerum): try to further generalize operator descriptions
         // TODO (cgerum): generalized layout transform
@@ -37,7 +37,7 @@ define_language! {
         "matmul"    = Matmul([Id; 2]),    // input1, input2
         "conv2d"    = Conv2d([Id; 6]),    // Conv2d
         "elementwise" = Elementwise([Id; 2]), // Function, input
-        "extern" = Extern(Box<[Id]>), // An external function call 
+        "extern" = Extern(Box<[Id]>), // An external function call (represents for example a relay function)
         Int(isize),
         UInt(usize),
         Symbol(Symbol),

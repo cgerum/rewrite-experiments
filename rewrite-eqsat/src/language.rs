@@ -39,8 +39,8 @@ define_language! {
         "concat"    = Concatenate(Box<[Id]>),
         "elementwise" = Elementwise([Id; 2]), // Function, input
         "extern" = Extern(Box<[Id]>), // An external function call (represents for example a relay function)
-        Int(isize),
-        UInt(usize),
+        Int(i64),
+        UInt(u64),
         Symbol(Symbol),
         
     }

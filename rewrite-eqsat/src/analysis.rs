@@ -158,10 +158,12 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 Self::Data {
                     kind: DataKind::Tensor,
                     constant: constant,
+                    shape: vec![a_data.shape[0], b_data.shape[1]],
                     ..Default::default()
                 }
             }
 
+            // assuming NHWC and OIHW
             TensorLang::Conv2d([stride_h, stride_w, pad, act, inpt, wght]) => {
                 // Check types
                 assert!(x(stride_h).kind == DataKind::Scalar);
@@ -176,12 +178,48 @@ impl Analysis<TensorLang> for TensorAnalysis {
                 let strideW = x(stride_w).val;
                 let constant = x(inpt).constant && x(wght).constant;
 
+                let output_shape = vec![x(inpt).shape[0], ((x(inpt).shape[1] + 2 * x(pad).val) - (x(wght).shape[2]/2)) / x(stride_h).val , ((x(inpt).shape[2] + 2 * x(pad).val) - (x(wght).shape[3]/2)) / x(stride_w).val , x(wght).shape[0]];
+
                 // Create tensorhandle and get metadata
                 Self::Data {
                     kind: DataKind::Tensor,
                     val: 0,
                     name: String::new(),
                     constant: constant,
+                    shape: output_shape,
+                    ..Default::default()
+                }
+            }
+
+            TensorLang::Concatenate(params) => {
+                // Check types
+                let dim = x(&params[0]);
+                let tensor_list = &params[1..];
+                assert!(dim.kind == DataKind::Scalar);
+
+                let mut base_shape = x(&tensor_list[0]).shape.clone();
+                let mut out_shape = 0;
+                for elem in tensor_list.iter() {
+                    let data = x(elem);
+                    assert!(data.kind == DataKind::Tensor);
+                    assert!(data.shape.len() == base_shape.len());
+
+                    let mut inx:usize = 0;
+                    for i in data.shape.iter() {
+                        if inx == dim.val as usize { out_shape += *i; }
+                        else {assert!(base_shape[inx] == *i);}
+                        inx += 1 as usize;
+                    }
+                }
+                base_shape[dim.val as usize] = out_shape;
+
+
+                // create tensorhandle and get metadata
+                Self::Data {
+                    kind: DataKind::Tensor,
+                    val: 0,
+                    name: String::new(),
+                    shape: base_shape,
                     ..Default::default()
                 }
             }
@@ -340,5 +378,21 @@ mod tests {
         let data = &graph[id].data;
         assert!(data.kind == DataKind::Scalar);
         assert!(data.val == 1);
+    }
+
+    #[test]
+    fn test_concatenate(){
+        let expr: RecExpr<TensorLang> = "(concat 1 (tensor a (shape 1 2 3)) (tensor b (shape 1 2 3)))".parse().unwrap();
+        let mut graph: EGraph::<TensorLang, TensorAnalysis> = Default::default();
+
+
+        let id = graph.add_expr(&expr);
+        graph.rebuild();
+
+        let data = &graph[id].data;
+        assert!(data.kind == DataKind::Tensor);
+        assert!(data.shape[0] == 1);
+        assert!(data.shape[1] == 4);
+        assert!(data.shape[2] == 3);
     }
 }

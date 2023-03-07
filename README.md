@@ -78,6 +78,11 @@ An extended and non exhaustive List of possible TODOs:
 - [ ] Datatypes 
   - [ ] Arbitrary Precision Integer
   - [ ] Float (only fp16 and fp32 or arbitrary precision?)
-- [ ] Compiler Integration
 - [ ] NAS Integration
 - [ ] Python Bindings
+- [ ] TVM Integration
+  - [x] Relay to egg
+  - [ ] Reuse TVM type analysis
+  - [ ] Reuse TVM constant propagation
+  - [ ] target patterns
+  - [ ] egg to relay

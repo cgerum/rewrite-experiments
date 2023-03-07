@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use egg::RecExpr;
 
 use anyhow::Result;
+use itertools;
 
 use crate::TensorLang;
 
@@ -40,6 +41,8 @@ pub fn from_relay(relay_file: PathBuf) -> Result<ParserResult>{
 
 #[cfg(feature = "tvm")]
 fn parse_module(module: IRModule) -> ParserResult {
+    use std::any::Any;
+
     use egg::{Id, Symbol};
     use tvm::ir::relay::{Call, Constant, Var};
     use tvm::ir::op::Op;
@@ -50,7 +53,16 @@ fn parse_module(module: IRModule) -> ParserResult {
     
     println!("Found main function");
 
+    // Create Bindings for Parameters
     let params = main_func.params.clone();
+    let type_params = main_func.type_params.clone();
+
+    println!("Parsing function arguments");
+    for (param, param_type) in itertools::zip(params, type_params){
+        println!("Parsing function argument: {}", param.name_hint());
+    }
+
+
     let body = main_func.body.clone();
 
     let mut result = RecExpr::<TensorLang>::default();
@@ -75,7 +87,6 @@ fn parse_module(module: IRModule) -> ParserResult {
             call_id
         } else if let Ok(op) = expr.clone().downcast::<Op>(){
             let name = op.name.as_str().unwrap();
-            //println!("op: {}", name);
             let name_symbol = TensorLang::Symbol(Symbol::from(name));
             let name_id = result.add(name_symbol);
             name_id
@@ -88,7 +99,7 @@ fn parse_module(module: IRModule) -> ParserResult {
             let ndarray = &constant.data;
             let shape = ndarray.shape();
             let shape_ids : Vec<Id> = shape.iter().map(|x|{
-                result.add(TensorLang::UInt(*x as usize))
+                result.add(TensorLang::UInt(*x as u64))
             }).collect();
 
             let shape_id = result.add(TensorLang::Shape(shape_ids.into_boxed_slice()));
@@ -96,7 +107,9 @@ fn parse_module(module: IRModule) -> ParserResult {
             let constant_tensor = TensorLang::Const([constant_id, shape_id]);
             let constant_id = result.add(constant_tensor);
             constant_id
-        }else if let Ok(constant) = expr.clone().downcast::<Var>(){
+        }else if let Ok(variable) = expr.clone().downcast::<Var>(){
+            //args_vector.iter().find(var)
+
             let unknown_symbol = TensorLang::Symbol(Symbol::from("var"));
             let unknown_id = result.add(unknown_symbol);
             unknown_id

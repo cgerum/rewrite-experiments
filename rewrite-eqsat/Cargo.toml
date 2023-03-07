@@ -14,12 +14,12 @@ itertools = "0.10.5"
 ndarray = { version = "0.15.6"}
 rand = "0.8.5"
 rayon = {version="1.6.1", optional = true}
-serde = { version = "1.0.151", features = ["serde_derive"], optional = true }
+serde = { version = "1.0.151", features = ["serde_derive"] }
 tvm = { path = "../thirdparty/tvm/rust/tvm", optional = true }
 
 
 [features]
 default = ["serde", "tvm"]
-serde = ["dep:serde", "ndarray/serde", "egg/reports"]
+serde = ["ndarray/serde", "egg/reports"]
 rayon = ["dep:rayon", "ndarray/rayon"]
 tvm = ["dep:tvm"]

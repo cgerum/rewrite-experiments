@@ -34,15 +34,15 @@ pub struct TensorData {
     /// The data type of this eclass, can be a name/scalar/tensor
     pub kind: DataKind,
     /// The value of this eclass if it is a Scalar type
-    pub val: isize,
+    pub val: i64,
     /// The name string of this eclass if it is a Name type
     pub name: String,
     /// If the tensor results from all constant computations
     pub constant: bool,
     /// Shape if it is a shape or tensor type
-    pub shape: Vec<i32>,
+    pub shape: Vec<i64>,
     /// Data 
-    pub data: Option<ArrayD<i32>>, //FIXME: allow symbolic values
+    pub data: Option<ArrayD<i64>>, //FIXME: allow symbolic values
 }
 
 impl Default for TensorData {
@@ -95,7 +95,7 @@ impl Analysis<TensorLang> for TensorAnalysis {
 
             TensorLang::Shape(shape) => {
 
-                let mut s : Vec<i32> = Vec::default();
+                let mut s : Vec<i64> = Vec::default();
 
                 for elem in shape.iter() {
                     let data = x(elem);
@@ -264,7 +264,7 @@ impl Analysis<TensorLang> for TensorAnalysis {
             },
             TensorLang::UInt(_n) => Self::Data {
                 kind: DataKind::Scalar,
-                val: *_n as isize, //FIXME: make analysis type sensitive
+                val: *_n as i64, //FIXME: make analysis type sensitive
                 name: String::new(),
                 constant: true,
                 ..Default::default()

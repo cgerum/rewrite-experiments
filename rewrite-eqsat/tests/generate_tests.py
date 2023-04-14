@@ -32,7 +32,6 @@ for name, get_workload, args in workloads:
 
     os.makedirs("ir", exist_ok=True)
 
-
     transforms = Sequential([SimplifyInference(), FoldScaleAxis(), FoldConstant()])
     mod["main"] = bind_params_by_name(mod["main"], params)
 

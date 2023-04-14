@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-source ./env
+source ./.env
 
 mkdir -p $TVM_HOME/build
 pushd $TVM_HOME/build

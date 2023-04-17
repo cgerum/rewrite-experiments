@@ -1,5 +1,6 @@
 import os
 from tvm.relay.testing import mobilenet, resnet
+from tvm.relay.testing import mobilenet, resnet
 from tvm.relay.transform import SimplifyInference, FoldScaleAxis, FoldConstant
 from tvm.ir.transform import Sequential
 from tvm.relay.build_module import bind_params_by_name

@@ -79,10 +79,32 @@ fn parse_module(module: IRModule) -> ParserResult {
             for arg in call.args.clone() {
                 args_vector.push(recurse(result, const_counter, arg));
             }
+
+            if let Ok(op) = call.op.clone().upcast::<tvm::ir::expr::BaseExpr>().downcast::<tvm::ir::op::Op>() {
+                match op.name.as_str().unwrap() {
+                    "nn.conv2d" => {
+                        let attrs = call
+                            .attrs
+                            .clone()
+                            .downcast::<tvm::ir::relay::attrs::nn::Conv2DAttrs>()
+                            .unwrap();
+                        
+
+                        let strides = attrs.strides.clone();
+                        let dilation = attrs.dilation.clone();
+                        let padding = attrs.padding.clone();
+                        let dilation = attrs.dilation.clone();
+                        let groups = attrs.groups.clone();
+                        let channels = attrs.channels.clone();
+                        
+                        
+                    }
+                    &_ => todo!()
+                }
+            }
             
             let call_node = TensorLang::Extern(args_vector.into_boxed_slice());
 
-            
             let call_id = result.add(call_node);
             call_id
         } else if let Ok(op) = expr.clone().downcast::<Op>(){
